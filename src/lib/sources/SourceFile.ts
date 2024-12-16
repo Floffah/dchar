@@ -54,8 +54,8 @@ export class SourceFile {
     public author: string | undefined;
     public description: string | undefined;
 
-    private initialized = false;
-    public loaded = false;
+    private isInitialised = false;
+    public isLoaded = false;
 
     public value: SourceFileLuaTable | null = null;
 
@@ -70,11 +70,9 @@ export class SourceFile {
     ) {}
 
     async init() {
-        if (this.initialized) {
+        if (this.isInitialised) {
             return this.value!;
         }
-
-        this.initialized = true;
 
         const source = await this.source.engine?.doString(this.sourceCode);
 
@@ -88,6 +86,7 @@ export class SourceFile {
         this.description = source?.description;
 
         this.value = source;
+        this.isInitialised = true;
 
         return this.value!;
     }
@@ -97,6 +96,8 @@ export class SourceFile {
 
         this.value?.onload();
 
+        this.isLoaded = true;
+
         return this.value!;
     }
 
@@ -105,6 +106,6 @@ export class SourceFile {
 
         this.value?.onunload?.();
 
-        this.loaded = false;
+        this.isLoaded = false;
     }
 }
