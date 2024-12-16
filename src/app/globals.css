@@ -4,25 +4,25 @@
 
 html,
 html.light {
-  @apply bg-white text-gray-900;
+    @apply bg-white text-gray-900;
 }
 
 html.dark {
-  @apply bg-gray-950 text-white;
+    @apply bg-gray-950 text-white;
 }
 
 @media (prefers-color-scheme: dark) {
-  html:not(.light) {
-    @apply bg-gray-950 text-white;
-  }
+    html:not(.light) {
+        @apply bg-gray-950 text-white;
+    }
 }
 
 @layer utilities {
-  .no-scrollbar::-webkit-scrollbar {
-    display: none;
-  }
-  .no-scrollbar {
-    -ms-overflow-style: none; /* IE and Edge */
-    scrollbar-width: none; /* Firefox */
-  }
+    .no-scrollbar::-webkit-scrollbar {
+        display: none;
+    }
+    .no-scrollbar {
+        -ms-overflow-style: none; /* IE and Edge */
+        scrollbar-width: none; /* Firefox */
+    }
 }

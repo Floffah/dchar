@@ -1,11 +1,7 @@
 import { LuaEngine } from "wasmoon";
 
-import {
-    SourceFile,
-    SourceFileLuaTable,
-    SourceFileType,
-} from "@/lib/sources/SourceFile";
-import { createEngine, luaFactory } from "@/lib/sources/engine";
+import { SourceFile, SourceFileType } from "@/lib/sources/SourceFile";
+import { createEngine } from "@/lib/sources/engine";
 import { HTTPSourceResolver } from "@/lib/sources/resolver/HTTPSourceResolver";
 import { SourceResolver } from "@/lib/sources/resolver/SourceResolver";
 

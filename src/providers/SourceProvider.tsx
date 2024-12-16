@@ -1,12 +1,12 @@
 "use client";
 
-import { PropsWithChildren, createContext, useEffect, useRef } from "react";
-import { LuaEngine } from "wasmoon";
+import { PropsWithChildren, createContext, useEffect } from "react";
 
 import { loadSource } from "@/lib/sources";
 
 interface SourceContextValue {
     // loadSource(name: string): Promise<void>;
+    _?: never;
 }
 
 const SourceContext = createContext<SourceContextValue>(null!);
