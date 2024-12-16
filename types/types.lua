@@ -1,3 +1,8 @@
+---
+--@copyright 2024
+--@license MIT
+--@author Floffah
+
 --std lib
 
 --- Print to console

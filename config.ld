@@ -1,7 +1,6 @@
 project = "DChar"
 title = "DChar Documentation"
 description = "Lua API for DChar"
-file = "types/types.lua"
+file = "types"
 dir = "github-pages"
-readme = "manual.md"
 style = "!new"
