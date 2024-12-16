@@ -1,12 +1,10 @@
 # Based on https://gist.github.com/domenic/ec8b0fc8ab45f39403dd
 name: Build Docs
 on:
-  pull_request:
-    branches:
-      - master
+  workflow_dispatch:
   push:
     branches:
-      - master
+      - main
 jobs:
   build:
     name: Build docs
