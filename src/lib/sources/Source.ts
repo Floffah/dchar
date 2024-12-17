@@ -1,12 +1,14 @@
 import { LuaEngine } from "wasmoon";
 
 import { SourceFile, SourceFileType } from "@/lib/sources/SourceFile";
+import { SourceSet } from "@/lib/sources/SourceSet";
 import { createEngine } from "@/lib/sources/engine";
 import { HTTPSourceResolver } from "@/lib/sources/resolver/HTTPSourceResolver";
 import { SourceResolver } from "@/lib/sources/resolver/SourceResolver";
 
 interface SourceOpts {
     resolver?: SourceResolver;
+    set?: SourceSet;
 }
 
 export class Source {
@@ -18,19 +20,25 @@ export class Source {
     public engine: LuaEngine | null = null;
 
     private resolver: SourceResolver;
+    public sourceSet: SourceSet | null = null;
 
     public main: SourceFile | null = null;
     public allSources: SourceFile[] = [];
 
     constructor(
         public readonly id: string,
-        { resolver = new HTTPSourceResolver(this, {}) }: SourceOpts,
+        { resolver = new HTTPSourceResolver(this, {}), set }: SourceOpts,
     ) {
         this.resolver = resolver;
+        this.sourceSet = set ?? null;
     }
 
     async load() {
         console.log(`Loading source by id '${this.id}'`);
+
+        if (this.sourceSet && !this.sourceSet.sources.includes(this)) {
+            this.sourceSet.sources.push(this);
+        }
 
         this.engine = await createEngine({
             source: this,
@@ -59,6 +67,16 @@ export class Source {
 
         this.main = sourceFile;
         this.allSources.push(sourceFile);
+
+        if (sourceValue.extends && Array.isArray(sourceValue.extends)) {
+            if (!this.sourceSet) {
+                throw new Error("Cannot extend source without a source set");
+            }
+
+            for (const extend of sourceValue.extends) {
+                await this.sourceSet.loadSource(extend);
+            }
+        }
 
         if (Array.isArray(sourceValue?.dependencies)) {
             for (const dependency of sourceValue.dependencies) {

@@ -11,6 +11,7 @@
   "dependencies": {
     "@tanstack/react-query": "^5.62.7",
     "clsx": "^2.1.1",
+    "nanoid": "^5.0.9",
     "next": "15.1.0",
     "react": "^19.0.0",
     "react-dom": "^19.0.0",
@@ -26,6 +27,7 @@
     "eslint-config-next": "15.1.0",
     "eslint-config-prettier": "^9.1.0",
     "eslint-plugin-prettier": "^5.2.1",
+    "lua-format": "^1.5.2",
     "postcss": "^8.4.49",
     "prettier": "^3.4.2",
     "prettier-plugin-tailwindcss": "^0.6.9",

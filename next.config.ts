@@ -8,6 +8,11 @@ const nextConfig: NextConfig = {
             };
         }
 
+        config.module.rules.push({
+            test: /\.lua/,
+            use: "raw-loader",
+        });
+
         return config;
     },
 };

@@ -1,3 +1,4 @@
+import { nanoid } from "nanoid";
 import { LuaFactory } from "wasmoon";
 
 import { Source } from "@/lib/sources/Source";
@@ -24,12 +25,30 @@ export async function createEngine({ source }: CreateEngineOpts) {
         console.log(...args);
     });
 
-    engine.global.set("require", (pathname: string) => {
+    engine.global.set("require", (pathname: string, sourceId: string) => {
         if (!pathname) {
             throw new Error("'pathname' must be provided");
         }
 
-        const sourceFile = source.allSources.find(
+        let fromSource: Source | undefined = source;
+
+        if (sourceId) {
+            if (!source.sourceSet) {
+                throw new Error(
+                    "Source must be part of a SourceSet to use 'sourceId'",
+                );
+            }
+
+            fromSource = source.sourceSet.sources.find(
+                (source) => source.id === sourceId,
+            );
+        }
+
+        if (!fromSource) {
+            throw new Error(`No source found with id '${sourceId}'`);
+        }
+
+        const sourceFile = fromSource.allSources.find(
             (sourceFile) => sourceFile.path === pathname,
         );
 
@@ -37,7 +56,7 @@ export async function createEngine({ source }: CreateEngineOpts) {
             throw new Error(`No source file found at path '${pathname}'`);
         }
 
-        sourceFile.init();
+        sourceFile.load();
 
         return sourceFile.value!;
     });
@@ -59,27 +78,26 @@ export async function createEngine({ source }: CreateEngineOpts) {
         return sourceFile.isLoaded;
     });
 
-    engine.global.set("loadsource", (pathname: string) => {
-        if (!pathname) {
-            throw new Error("'pathname' must be provided");
-        }
+    if (source.sourceSet) {
+        engine.global.set(
+            "declarevariable",
+            (name: string, initialValue: any, opts: any) => {
+                const ref = nanoid();
 
-        const sourceFile = source.allSources.find(
-            (sourceFile) => sourceFile.path === pathname,
+                const baseref = (source.sourceSet!.variables[name] = {
+                    name,
+                    ref,
+                    value: initialValue,
+                    type: opts?.type ?? typeof initialValue ?? "string",
+                });
+
+                return {
+                    ...baseref,
+                    get: () => source.sourceSet!.variables[name].value,
+                };
+            },
         );
-
-        if (!sourceFile) {
-            throw new Error(`No source file found at path '${pathname}'`);
-        }
-
-        if (sourceFile.isLoaded) {
-            throw new Error(
-                `Source file at path '${pathname}' is already loaded`,
-            );
-        }
-
-        return sourceFile.load();
-    });
+    }
 
     return engine;
 }

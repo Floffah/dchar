@@ -3,6 +3,7 @@
 import { PropsWithChildren, createContext, useEffect } from "react";
 
 import { loadSource } from "@/lib/sources";
+import { SourceSet } from "@/lib/sources/SourceSet";
 
 interface SourceContextValue {
     // loadSource(name: string): Promise<void>;
@@ -13,7 +14,9 @@ const SourceContext = createContext<SourceContextValue>(null!);
 
 export function SourceProvider({ children }: PropsWithChildren) {
     useEffect(() => {
-        const fifthEdition = loadSource("5e");
+        const set = new SourceSet();
+
+        const fifthEdition = loadSource("5e", set);
 
         return () => {
             fifthEdition.then((source) => source.unload());

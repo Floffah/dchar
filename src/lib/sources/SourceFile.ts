@@ -27,6 +27,11 @@ export interface SourceFileLuaTable {
     description?: string;
 
     /**
+     * Other sources that this source extends from. These are source IDs not paths. To import lua paths, use the `dependencies` field.
+     * Ignored on all source files except the main source file.
+     */
+    extends?: string[];
+    /**
      * The dependencies of the source or source file. Relative file paths.
      */
     dependencies?: string[];
@@ -92,6 +97,10 @@ export class SourceFile {
     }
 
     async load() {
+        if (this.isLoaded) {
+            return this.value!;
+        }
+
         await this.init();
 
         this.value?.onload();
