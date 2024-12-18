@@ -1,7 +1,10 @@
+import luaBuiltins from "../../../stdlib/builtins.lua";
 import { nanoid } from "nanoid";
 import { LuaFactory } from "wasmoon";
 
 import { Source } from "@/lib/sources/Source";
+import { EditWizardField } from "@/lib/sources/SourceSetEditWizard";
+import { logSourceLuaMessage } from "@/lib/styledLogs";
 
 let luaFactory: LuaFactory;
 
@@ -20,9 +23,11 @@ export async function createEngine({ source }: CreateEngineOpts) {
         openStandardLibs: false,
     });
 
+    await engine.doString(luaBuiltins);
+
     // std lib stuff
     engine.global.set("print", (...args: any[]) => {
-        console.log(...args);
+        logSourceLuaMessage(source, args.join("\t"));
     });
 
     engine.global.set("require", (pathname: string, sourceId: string) => {
@@ -80,23 +85,76 @@ export async function createEngine({ source }: CreateEngineOpts) {
 
     if (source.sourceSet) {
         engine.global.set(
-            "declarevariable",
-            (name: string, initialValue: any, opts: any) => {
+            "variable",
+            (name: string, initialValue: any, _opts: any) => {
+                if (source.sourceSet!.variables[name]) {
+                    return source.sourceSet!.variables[name];
+                }
+
                 const ref = nanoid();
 
                 const baseref = (source.sourceSet!.variables[name] = {
                     name,
                     ref,
                     value: initialValue,
-                    type: opts?.type ?? typeof initialValue ?? "string",
                 });
 
                 return {
                     ...baseref,
                     get: () => source.sourceSet!.variables[name].value,
+                    set: (value: any) => {
+                        source.sourceSet!.variables[name].value = value;
+                    },
                 };
             },
         );
+
+        engine.global.set("editwizard", {
+            page: (id: string, name: string) => {
+                const page = source.sourceSet!.editWizard.pages[id] || {
+                    name,
+                    sections: {},
+                };
+
+                page.name = name;
+
+                source.sourceSet!.editWizard.pages[id] = page;
+            },
+            section: (id: string, name: string, page: string) => {
+                const pageObj = source.sourceSet!.editWizard.pages[page];
+
+                if (!pageObj) {
+                    throw new Error(`No page found with id '${page}'`);
+                }
+
+                const section = pageObj.sections[id] || { name, fields: {} };
+
+                section.name = name;
+
+                pageObj.sections[id] = section;
+            },
+            field: (
+                id: string,
+                options: EditWizardField & { page: string; section: string },
+            ) => {
+                const pageObj =
+                    source.sourceSet!.editWizard.pages[options.page];
+
+                if (!pageObj) {
+                    throw new Error(`No page found with id '${options.page}'`);
+                }
+
+                const section = pageObj.sections[options.section];
+
+                if (!section) {
+                    throw new Error(
+                        `No section found with id '${options.section}'`,
+                    );
+                }
+
+                section.fields[id] = options;
+            },
+        });
     }
 
     return engine;

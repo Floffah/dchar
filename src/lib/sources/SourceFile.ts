@@ -1,4 +1,5 @@
 import { Source } from "@/lib/sources/Source";
+import { logSourceFileMessage } from "@/lib/styledLogs";
 
 export enum SourceFileType {
     Main,
@@ -79,6 +80,8 @@ export class SourceFile {
             return this.value!;
         }
 
+        logSourceFileMessage(this, `Initialising source file`);
+
         const source = await this.source.engine?.doString(this.sourceCode);
 
         if (typeof source !== "object") {
@@ -93,6 +96,7 @@ export class SourceFile {
         this.value = source;
         this.isInitialised = true;
 
+        logSourceFileMessage(this, `Source file initialised`);
         return this.value!;
     }
 
@@ -103,18 +107,23 @@ export class SourceFile {
 
         await this.init();
 
+        logSourceFileMessage(this, `Loading source file`);
         this.value?.onload();
 
         this.isLoaded = true;
 
+        logSourceFileMessage(this, `Source file loaded`);
         return this.value!;
     }
 
     async unload() {
         await this.init();
 
+        logSourceFileMessage(this, `Unloading source file`);
         this.value?.onunload?.();
 
         this.isLoaded = false;
+
+        logSourceFileMessage(this, `Source file unloaded`);
     }
 }

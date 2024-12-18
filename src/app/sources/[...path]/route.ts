@@ -30,11 +30,13 @@ export const GET = async (req: NextRequest) => {
     const minified = Minify(file, {
         RenameVariables: true,
         RenameFunctions: true,
-    });
+    })
+        .replace(/--\[\[[\s\S]*-]]/g, "")
+        .trim();
 
     return new NextResponse(minified, {
         headers: {
-            "Content-Type": "text/plain",
+            "Content-Type": "text/x-lua",
         },
     });
 };

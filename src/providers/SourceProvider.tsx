@@ -18,6 +18,8 @@ export function SourceProvider({ children }: PropsWithChildren) {
 
         const fifthEdition = loadSource("5e", set);
 
+        fifthEdition.then(() => console.log(set));
+
         return () => {
             fifthEdition.then((source) => source.unload());
         };

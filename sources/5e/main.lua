@@ -1,5 +1,3 @@
-print("hello from lua");
-
 local Source = {
     name = "Dungeons & Dragons 5e",
     version = "2024",
@@ -13,6 +11,7 @@ local Source = {
 }
 
 function Source.onload()
+    print("hello from lua");
 end
 
 return Source

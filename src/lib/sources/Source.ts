@@ -5,6 +5,7 @@ import { SourceSet } from "@/lib/sources/SourceSet";
 import { createEngine } from "@/lib/sources/engine";
 import { HTTPSourceResolver } from "@/lib/sources/resolver/HTTPSourceResolver";
 import { SourceResolver } from "@/lib/sources/resolver/SourceResolver";
+import { logSourceSystemMessage } from "@/lib/styledLogs";
 
 interface SourceOpts {
     resolver?: SourceResolver;
@@ -34,7 +35,7 @@ export class Source {
     }
 
     async load() {
-        console.log(`Loading source by id '${this.id}'`);
+        logSourceSystemMessage(this, `Loading source by id '${this.id}'`);
 
         if (this.sourceSet && !this.sourceSet.sources.includes(this)) {
             this.sourceSet.sources.push(this);
@@ -47,6 +48,7 @@ export class Source {
         let sourceFile: SourceFile;
 
         try {
+            logSourceSystemMessage(this, `Fetching source's main.lua`);
             sourceFile = await this.resolver.resolve(
                 this.id,
                 "main.lua",
@@ -74,12 +76,17 @@ export class Source {
             }
 
             for (const extend of sourceValue.extends) {
+                logSourceSystemMessage(this, `Found extend '${extend}'`);
                 await this.sourceSet.loadSource(extend);
             }
         }
 
         if (Array.isArray(sourceValue?.dependencies)) {
             for (const dependency of sourceValue.dependencies) {
+                logSourceSystemMessage(
+                    this,
+                    `Found dependency '${dependency}'`,
+                );
                 await this.loadSourceFile(
                     dependency,
                     SourceFileType.Dependency,
@@ -89,14 +96,25 @@ export class Source {
 
         if (Array.isArray(sourceValue?.optional)) {
             for (const optional of sourceValue?.optional ?? []) {
+                logSourceSystemMessage(
+                    this,
+                    `Found optional dependency '${optional}'`,
+                );
                 await this.loadSourceFile(optional, SourceFileType.Optional);
             }
         }
 
         await sourceFile.load();
+
+        logSourceSystemMessage(
+            this,
+            `Loaded source '${this.name}' (${this.id})`,
+        );
     }
 
     async loadSourceFile(path: string, type: SourceFileType) {
+        logSourceSystemMessage(this, `Load requested for path '${path}'`);
+
         const existingSource = this.allSources.find(
             (source) => source.path === path,
         );
@@ -113,6 +131,10 @@ export class Source {
 
         if (Array.isArray(value?.dependencies)) {
             for (const dependency of value.dependencies) {
+                logSourceSystemMessage(
+                    this,
+                    `Found dependency '${dependency}'`,
+                );
                 const dependencyFile = await this.loadSourceFile(
                     dependency,
                     SourceFileType.Dependency,
@@ -124,6 +146,10 @@ export class Source {
 
         if (Array.isArray(value?.optional)) {
             for (const optional of value.optional) {
+                logSourceSystemMessage(
+                    this,
+                    `Found optional dependency '${optional}'`,
+                );
                 const dependencyFile = await this.loadSourceFile(
                     optional,
                     SourceFileType.Optional,
@@ -135,13 +161,19 @@ export class Source {
 
         if (type !== SourceFileType.Optional) {
             await sourceFile.load();
+        } else {
+            logSourceSystemMessage(
+                this,
+                `Skipping load for optional source file '${path}'`,
+            );
         }
 
         return sourceFile;
     }
 
     async unload() {
-        console.log(
+        logSourceSystemMessage(
+            this,
             `Unloading source '${this.name}' (${this.id}) and all associated source files`,
         );
 

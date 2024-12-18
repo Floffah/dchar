@@ -5,7 +5,20 @@ local Source = {
 }
 
 function Source.onload()
-    declarevariable("Character Name", "Chris P. Bacon", {type = "string"})
+    variable("characterName", "Chris P. Bacon", {type = "string"})
+    
+    editwizard.page("character-info", "Character Info")
+    
+    editwizard.section("details", "Details", "character-info")
+    
+    editwizard.field("characterName", {
+        label = "Character Name",
+        type = "string",
+        page = "character-info",
+        section = "details",
+        variable = "characterName",
+        default = "Chris P. Bacon",
+    })
 end
 
 return Source

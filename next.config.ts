@@ -10,7 +10,15 @@ const nextConfig: NextConfig = {
 
         config.module.rules.push({
             test: /\.lua/,
-            use: "raw-loader",
+            use: [
+                {
+                    loader: "./src/lib/webpackLoaders/lua-loader.js",
+                    options: {
+                        RenameVariables: true,
+                        RenameFunctions: true,
+                    },
+                },
+            ],
         });
 
         return config;
