@@ -1,0 +1,37 @@
+{
+    "AUTO GENERATED": "DO NOT EDIT",
+    "": "",
+    "sources": [
+        {
+            "extends": [
+                "base"
+            ],
+            "name": "Dungeons & Dragons Base",
+            "lib": true,
+            "description": "Implements all the base functionality for a dungeons and dragons flavoured DChar character sheet. Does not include actual D&D source content",
+            "author": "DChar Contributors",
+            "id": "dnd"
+        },
+        {
+            "dependencies": [
+                "coreset.lua"
+            ],
+            "extends": [
+                "dnd"
+            ],
+            "name": "Dungeons & Dragons 5e",
+            "optional": {},
+            "description": "The fifth edition of the Dungeons & Dragons role-playing game.",
+            "author": "Wizards of the Coast",
+            "version": "2024",
+            "id": "5e"
+        },
+        {
+            "lib": true,
+            "name": "Base Source",
+            "author": "DChar Contributors",
+            "description": "Implements all the base functionality for a DChar character sheet",
+            "id": "base"
+        }
+    ]
+}

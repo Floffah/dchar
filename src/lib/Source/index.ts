@@ -1,10 +1,10 @@
 import { LuaEngine } from "wasmoon";
 
-import { SourceFile, SourceFileType } from "@/lib/sources/SourceFile";
-import { SourceSet } from "@/lib/sources/SourceSet";
-import { createEngine } from "@/lib/sources/engine";
-import { HTTPSourceResolver } from "@/lib/sources/resolver/HTTPSourceResolver";
-import { SourceResolver } from "@/lib/sources/resolver/SourceResolver";
+import { SourceFile, SourceFileType } from "@/lib/Source/SourceFile";
+import { SourceSet } from "@/lib/Source/SourceSet";
+import { createEngine } from "@/lib/Source/engine";
+import { HTTPSourceResolver } from "@/lib/Source/resolver/HTTPSourceResolver";
+import { SourceResolver } from "@/lib/Source/resolver/SourceResolver";
 import { logSourceSystemMessage } from "@/lib/styledLogs";
 
 interface SourceOpts {
@@ -25,6 +25,7 @@ export class Source {
 
     public main: SourceFile | null = null;
     public allSources: SourceFile[] = [];
+    public extends: Source[] = [];
 
     constructor(
         public readonly id: string,
@@ -70,14 +71,21 @@ export class Source {
         this.main = sourceFile;
         this.allSources.push(sourceFile);
 
-        if (sourceValue.extends && Array.isArray(sourceValue.extends)) {
+        if (
+            this.id !== "base" &&
+            (!sourceValue.extends || !Array.isArray(sourceValue.extends))
+        ) {
+            sourceValue.extends = ["base"];
+        }
+
+        if (sourceValue.extends) {
             if (!this.sourceSet) {
                 throw new Error("Cannot extend source without a source set");
             }
 
             for (const extend of sourceValue.extends) {
                 logSourceSystemMessage(this, `Found extend '${extend}'`);
-                await this.sourceSet.loadSource(extend);
+                this.extends.push(await this.sourceSet.loadSource(extend));
             }
         }
 

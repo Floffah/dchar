@@ -21,7 +21,12 @@
     "paths": {
       "@/*": ["./src/*"],
       "~public/*": ["./public/*"],
-    }
+      "~sources": ["./sources/sources.json"]
+    },
+    "types": [
+      "unplugin-icons/types/react",
+      "@types/bun"
+    ]
   },
   "include": ["next-env.d.ts", "**/*.ts", "**/*.tsx", ".next/types/**/*.ts"],
   "exclude": ["node_modules"]

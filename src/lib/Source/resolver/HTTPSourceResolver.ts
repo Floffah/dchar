@@ -1,6 +1,6 @@
-import { Source } from "@/lib/sources/Source";
-import { SourceFile, SourceFileType } from "@/lib/sources/SourceFile";
-import { SourceResolver } from "@/lib/sources/resolver/SourceResolver";
+import { Source } from "@/lib/Source";
+import { SourceFile, SourceFileType } from "@/lib/Source/SourceFile";
+import { SourceResolver } from "@/lib/Source/resolver/SourceResolver";
 
 interface HTTPSourceResolverOpts {
     baseUrl?: string;

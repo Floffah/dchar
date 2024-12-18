@@ -1,4 +1,5 @@
 import type { NextConfig } from "next";
+import Icons from "unplugin-icons/webpack";
 
 const nextConfig: NextConfig = {
     webpack: (config, { isServer }) => {
@@ -12,7 +13,7 @@ const nextConfig: NextConfig = {
             test: /\.lua/,
             use: [
                 {
-                    loader: "./src/lib/webpackLoaders/lua-loader.js",
+                    loader: "./src/lib/webpack/lua-loader.js",
                     options: {
                         RenameVariables: true,
                         RenameFunctions: true,
@@ -20,6 +21,13 @@ const nextConfig: NextConfig = {
                 },
             ],
         });
+
+        config.plugins.push(
+            Icons({
+                compiler: "jsx",
+                jsx: "react",
+            }),
+        );
 
         return config;
     },

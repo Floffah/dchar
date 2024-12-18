@@ -4,7 +4,7 @@ import type { Metadata } from "next";
 import { Inter } from "next/font/google";
 import { PropsWithChildren } from "react";
 
-import { SourceProvider } from "@/providers/SourceProvider";
+import { SourcesProvider } from "@/providers/SourcesProvider";
 
 export const metadata: Metadata = {
     title: "Create Next App",
@@ -20,7 +20,7 @@ export default function RootLayout({ children }: Readonly<PropsWithChildren>) {
     return (
         <html lang="en" className={inter.variable}>
             <body className={clsx(inter.className, "antialiased")}>
-                <SourceProvider>{children}</SourceProvider>
+                <SourcesProvider>{children}</SourcesProvider>
             </body>
         </html>
     );

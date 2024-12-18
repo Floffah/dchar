@@ -1,4 +1,4 @@
-import { SourceSet } from "@/lib/sources/SourceSet";
+import { SourceSet } from "@/lib/Source/SourceSet";
 
 export interface EditWizardField {
     label: string;

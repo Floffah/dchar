@@ -1,4 +1,4 @@
-import { Source } from "@/lib/sources/Source";
+import { Source } from "@/lib/Source/index";
 import { logSourceFileMessage } from "@/lib/styledLogs";
 
 export enum SourceFileType {
@@ -29,7 +29,7 @@ export interface SourceFileLuaTable {
 
     /**
      * Other sources that this source extends from. These are source IDs not paths. To import lua paths, use the `dependencies` field.
-     * Ignored on all source files except the main source file.
+     * Ignored on all source files except the main source file. If omitted, defaults to { "base" }.
      */
     extends?: string[];
     /**

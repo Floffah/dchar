@@ -2,8 +2,8 @@ import luaBuiltins from "../../../stdlib/builtins.lua";
 import { nanoid } from "nanoid";
 import { LuaFactory } from "wasmoon";
 
-import { Source } from "@/lib/sources/Source";
-import { EditWizardField } from "@/lib/sources/SourceSetEditWizard";
+import { EditWizardField } from "@/lib/Source/SourceSetEditWizard";
+import { Source } from "@/lib/Source/index";
 import { logSourceLuaMessage } from "@/lib/styledLogs";
 
 let luaFactory: LuaFactory;
@@ -87,20 +87,20 @@ export async function createEngine({ source }: CreateEngineOpts) {
         engine.global.set(
             "variable",
             (name: string, initialValue: any, _opts: any) => {
-                if (source.sourceSet!.variables[name]) {
-                    return source.sourceSet!.variables[name];
+                let variable = source.sourceSet!.variables[name];
+
+                if (!variable) {
+                    const ref = nanoid();
+
+                    variable = source.sourceSet!.variables[name] = {
+                        name,
+                        ref,
+                        value: initialValue,
+                    };
                 }
 
-                const ref = nanoid();
-
-                const baseref = (source.sourceSet!.variables[name] = {
-                    name,
-                    ref,
-                    value: initialValue,
-                });
-
                 return {
-                    ...baseref,
+                    ...variable,
                     get: () => source.sourceSet!.variables[name].value,
                     set: (value: any) => {
                         source.sourceSet!.variables[name].value = value;

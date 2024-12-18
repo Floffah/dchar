@@ -27,6 +27,7 @@ const eslintConfig = [
                     caughtErrorsIgnorePattern: "^_",
                 },
             ],
+            "react/display-name": "off",
         },
     },
 ];

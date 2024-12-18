@@ -1,5 +1,5 @@
-import { Source } from "@/lib/sources/Source";
-import { SourceSetEditWizard } from "@/lib/sources/SourceSetEditWizard";
+import { SourceSetEditWizard } from "@/lib/Source/SourceSetEditWizard";
+import { Source } from "@/lib/Source/index";
 
 export class SourceSet {
     public sources: Source[] = [];
@@ -15,5 +15,7 @@ export class SourceSet {
         const source = new Source(id, { set: this });
 
         await source.load();
+
+        return source;
     }
 }

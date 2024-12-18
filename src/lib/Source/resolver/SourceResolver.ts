@@ -1,4 +1,4 @@
-import { SourceFile, SourceFileType } from "@/lib/sources/SourceFile";
+import { SourceFile, SourceFileType } from "@/lib/Source/SourceFile";
 
 export abstract class SourceResolver {
     abstract resolve(

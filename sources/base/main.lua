@@ -2,6 +2,7 @@ local Source = {
     name = "Base Source",
     author = "DChar Contributors",
     description = "Implements all the base functionality for a DChar character sheet",
+    lib = true,
 }
 
 function Source.onload()

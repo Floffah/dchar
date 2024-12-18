@@ -12,6 +12,10 @@ export async function generateStaticParams() {
     const params: { path: string[] }[] = [];
 
     for (const source of sources) {
+        if (source.split(".").length > 1) {
+            continue;
+        }
+
         const files = readdirSync(`./sources/${source}`);
 
         for (const file of files) {
@@ -24,6 +28,14 @@ export async function generateStaticParams() {
 
 export const GET = async (req: NextRequest) => {
     const path = req.nextUrl.pathname;
+
+    if (path === "/sources") {
+        return new NextResponse(JSON.stringify(readdirSync("./sources")), {
+            headers: {
+                "Content-Type": "application/json",
+            },
+        });
+    }
 
     const file = readFileSync("." + path, "utf-8");
 

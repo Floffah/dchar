@@ -1,5 +1,5 @@
-import { Source } from "@/lib/sources/Source";
-import { SourceFile } from "@/lib/sources/SourceFile";
+import { Source } from "@/lib/Source";
+import { SourceFile } from "@/lib/Source/SourceFile";
 
 function tagcss(color: string, radius = "0.25rem") {
     return `font-weight: bold; background-color: ${color}; color: white; padding: 0rem 0.125rem; border-radius: ${radius};`;
