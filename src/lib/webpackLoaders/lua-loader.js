@@ -1,11 +1,10 @@
-import { getOptions } from "loader-utils";
 import { Minify } from "lua-format";
 
 /**
  * for use with webpack
  */
 export default function rawLuaLoader(source) {
-    const options = getOptions(this);
+    const options = this.getOptions();
 
     const minified = Minify(source, options)
         .replace(/--\[\[[\s\S]*-]]/g, "")
