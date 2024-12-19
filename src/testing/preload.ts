@@ -1,4 +1,4 @@
-import { beforeAll, beforeEach } from "bun:test";
+import { beforeAll } from "bun:test";
 
 import { mockLog } from "@/testing/mocks";
 
