@@ -20,7 +20,7 @@ export class Source {
 
     public engine: LuaEngine | null = null;
 
-    private resolver: SourceResolver;
+    public resolver: SourceResolver;
     public sourceSet: SourceSet | null = null;
 
     public main: SourceFile | null = null;
@@ -29,7 +29,7 @@ export class Source {
 
     constructor(
         public readonly id: string,
-        { resolver = new HTTPSourceResolver(this, {}), set }: SourceOpts,
+        { resolver = new HTTPSourceResolver(), set }: SourceOpts,
     ) {
         this.resolver = resolver;
         this.sourceSet = set ?? null;
@@ -50,11 +50,12 @@ export class Source {
 
         try {
             logSourceSystemMessage(this, `Fetching source's main.lua`);
-            sourceFile = await this.resolver.resolve(
-                this.id,
-                "main.lua",
-                SourceFileType.Main,
-            );
+            sourceFile = await this.resolver.resolve({
+                id: this.id,
+                path: "main.lua",
+                type: SourceFileType.Main,
+                source: this,
+            });
         } catch (e: any) {
             throw new Error(`No source exists for id '${this.id}'`, {
                 cause: e,
@@ -73,7 +74,8 @@ export class Source {
 
         if (
             this.id !== "base" &&
-            (!sourceValue.extends || !Array.isArray(sourceValue.extends))
+            (!sourceValue.extends || !Array.isArray(sourceValue.extends)) &&
+            this.sourceSet
         ) {
             sourceValue.extends = ["base"];
         }
@@ -131,7 +133,12 @@ export class Source {
             return existingSource;
         }
 
-        const sourceFile = await this.resolver.resolve(this.id, path, type);
+        const sourceFile = await this.resolver.resolve({
+            id: this.id,
+            path,
+            type,
+            source: this,
+        });
 
         const value = await sourceFile.init();
 

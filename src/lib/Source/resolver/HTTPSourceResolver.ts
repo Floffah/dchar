@@ -1,6 +1,8 @@
-import { Source } from "@/lib/Source";
-import { SourceFile, SourceFileType } from "@/lib/Source/SourceFile";
-import { SourceResolver } from "@/lib/Source/resolver/SourceResolver";
+import { SourceFile } from "@/lib/Source/SourceFile";
+import {
+    ResolveSourceOpts,
+    SourceResolver,
+} from "@/lib/Source/resolver/SourceResolver";
 
 interface HTTPSourceResolverOpts {
     baseUrl?: string;
@@ -9,19 +11,14 @@ interface HTTPSourceResolverOpts {
 export class HTTPSourceResolver extends SourceResolver {
     private baseUrl: string;
 
-    constructor(
-        public source: Source,
-        {
-            baseUrl = window.location.origin + "/sources/",
-        }: HTTPSourceResolverOpts,
-    ) {
+    constructor({ baseUrl = "/sources/" }: HTTPSourceResolverOpts = {}) {
         super();
 
         this.baseUrl = baseUrl;
     }
 
-    async resolve(id: string, filePath: string, type: SourceFileType) {
-        const url = new URL(filePath, this.baseUrl + id + "/");
+    async resolve({ id, path, type, source }: ResolveSourceOpts) {
+        const url = new URL(path, this.baseUrl + id + "/");
 
         const response = await fetch(url.href);
 
@@ -31,6 +28,6 @@ export class HTTPSourceResolver extends SourceResolver {
 
         const sourceCode = await response.text();
 
-        return new SourceFile(this.source, type, filePath, sourceCode);
+        return new SourceFile(source, type, path, sourceCode);
     }
 }

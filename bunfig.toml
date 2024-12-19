@@ -1,0 +1,10 @@
+[install]
+saveTextLockfile = true
+
+[loader]
+".lua" = "text"
+
+[test]
+coverage = true
+coverageReporter = ["text", "lcov"]
+preload = ["./src/testing/preload.ts"]

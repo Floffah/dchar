@@ -4,11 +4,6 @@ import { PropsWithChildren, createContext, useContext, useMemo } from "react";
 
 import { SourceSet } from "@/lib/Source/SourceSet";
 
-// interface SourceContextValue {
-//     // loadSource(name: string): Promise<void>;
-//     _?: never;
-// }
-
 const SourceContext = createContext<SourceSet>(null!);
 
 export const useSources = () => useContext(SourceContext);
