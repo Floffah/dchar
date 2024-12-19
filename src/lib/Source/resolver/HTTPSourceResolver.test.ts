@@ -1,5 +1,5 @@
 import { Server } from "bun";
-import { beforeAll, expect, test } from "bun:test";
+import { afterAll, beforeAll, expect, test } from "bun:test";
 import { readFileSync } from "fs";
 import { resolve } from "path";
 
@@ -50,4 +50,8 @@ test("HTTPSourceResolver", async () => {
     expect(fifthEditionSource).toBeDefined();
     expect(dndSource).toBeDefined();
     expect(baseSource).toBeDefined();
+});
+
+afterAll(async () => {
+    await server.stop();
 });
