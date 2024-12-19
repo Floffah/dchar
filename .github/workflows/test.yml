@@ -1,7 +1,20 @@
-on: [push, pull_request]
+name: Test
+on:
+  push:
+    paths:
+      - 'sources/**'
+      - 'src/**'
+      - 'stdlib/**'
+      - 'package.json'
+  pull_request: 
+    paths:
+      - 'sources/**'
+      - 'src/**'
+      - 'stdlib/**'
+      - 'package.json'
 jobs:
   test:
-    name: Test
+    name: Run test suite
     runs-on: ubuntu-latest
     steps:
       - name: Checkout

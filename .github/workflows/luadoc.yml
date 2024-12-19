@@ -1,9 +1,11 @@
-name: Build Docs
+name: Docs
 on:
   workflow_dispatch:
   push:
     branches:
       - main
+    paths:
+      - "stdlib/**"
 jobs:
   build:
     name: Build docs
