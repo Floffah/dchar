@@ -237,5 +237,5 @@ describe("Edit wizard", () => {
 });
 
 afterAll(async () => {
-    await sourceSet.unloadAll();
+    await sourceSet.unload();
 });

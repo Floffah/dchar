@@ -26,6 +26,7 @@ export class Source {
     public main: SourceFile | null = null;
     public allSources: SourceFile[] = [];
     public extends: Source[] = [];
+    public subSources: Source[] = [];
 
     constructor(
         public readonly id: string,
@@ -87,7 +88,11 @@ export class Source {
 
             for (const extend of sourceValue.extends) {
                 logSourceSystemMessage(this, `Found extend '${extend}'`);
-                this.extends.push(await this.sourceSet.loadSource(extend));
+
+                const extendedSource = await this.sourceSet.loadSource(extend);
+                extendedSource.subSources.push(this);
+
+                this.extends.push(extendedSource);
             }
         }
 

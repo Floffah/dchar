@@ -18,7 +18,13 @@ export class HTTPSourceResolver extends SourceResolver {
     }
 
     async resolve({ id, path, type, source }: ResolveSourceOpts) {
-        const url = new URL(path, this.baseUrl + id + "/");
+        let baseUrl = this.baseUrl + id + "/";
+
+        if (baseUrl.startsWith("/") && typeof window !== "undefined") {
+            baseUrl = window.location.origin + baseUrl;
+        }
+
+        const url = new URL(path, baseUrl);
 
         const response = await fetch(url.href);
 

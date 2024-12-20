@@ -34,9 +34,12 @@ export function CreateCharacterForm() {
     const onSubmit = async (values: FormValues) => {
         router.prefetch("/character");
 
+        await sources.unload();
+
         try {
             await sources.loadSource(values.source);
         } catch (_e) {
+            console.log(_e);
             form.setError("source", {
                 message: "Failed to load source",
             });
@@ -51,7 +54,11 @@ export function CreateCharacterForm() {
             `setvariable("characterName", ${JSON.stringify(values.name)})`,
         );
 
-        router.push("/character");
+        const searchParams = new URLSearchParams();
+
+        searchParams.set("data", btoa(JSON.stringify(sources.save())));
+
+        router.push("/character?" + searchParams.toString());
     };
 
     return (
@@ -60,6 +67,8 @@ export function CreateCharacterForm() {
             submitHandler={onSubmit}
             className="flex flex-col gap-2"
         >
+            <h1 className="text-xl font-bold">Create a new character</h1>
+
             <Form.Input name="name" label="Character Name" />
 
             <FormField name="source" label="Choose a source">
@@ -70,7 +79,7 @@ export function CreateCharacterForm() {
                             key={source.id}
                             type="button"
                             className={clsx(
-                                "flex flex-col rounded-md p-2 text-left transition-colors",
+                                "flex flex-col rounded-md p-2 text-left transition-colors duration-150",
                                 {
                                     "outline outline-2 outline-blue-400 dark:outline-blue-600":
                                         selectedSource === source.id,

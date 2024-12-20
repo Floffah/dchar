@@ -1,13 +1,22 @@
 import { CreateCharacterForm } from "@/app/CreateCharacterForm";
+import { LoadCharacterSheet } from "@/app/LoadCharacterSheet";
+import { Divider } from "@/components/Divider";
 
 export default function Home() {
     return (
-        <div className="flex h-screen items-center justify-center">
-            <div className="flex flex-col gap-2 rounded-lg bg-gray-200 p-4 dark:bg-gray-800">
-                <h1 className="text-xl font-bold">Create a new character</h1>
-
+        <div className="flex h-screen items-center justify-center p-4">
+            <main className="relative flex flex-col gap-4 rounded-lg bg-gray-200 p-4 md:flex-row dark:bg-gray-800">
                 <CreateCharacterForm />
-            </div>
+
+                <Divider orientation="vertical" className="hidden md:flex">
+                    OR
+                </Divider>
+                <Divider orientation="horizontal" className="flex md:hidden">
+                    OR
+                </Divider>
+
+                <LoadCharacterSheet />
+            </main>
         </div>
     );
 }

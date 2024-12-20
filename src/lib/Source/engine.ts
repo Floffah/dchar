@@ -103,7 +103,18 @@ export async function createEngine({ source }: CreateEngineOpts) {
                     ...variable,
                     get: () => source.sourceSet!.variables[name].value,
                     set: (value: any) => {
+                        const oldValue = variable.value;
+
                         source.sourceSet!.variables[name].value = value;
+
+                        if (source.sourceSet) {
+                            source.sourceSet.emit(
+                                "variablesChanged",
+                                name,
+                                oldValue,
+                                value,
+                            );
+                        }
                     },
                 };
             },
