@@ -1,5 +1,4 @@
 import EventEmitter from "events";
-import { nanoid } from "nanoid";
 import TypedEmitter from "typed-emitter/rxjs";
 
 import { SourceSetEditWizard } from "@/lib/Source/SourceSetEditWizard";
@@ -25,10 +24,7 @@ const Emitter = EventEmitter as unknown as {
 export class SourceSet extends Emitter {
     public sources: Source[] = [];
 
-    public variables: Record<
-        string,
-        { name: string; ref: string; value: any }
-    > = {};
+    public variables: Record<string, { name: string; value: any }> = {};
 
     public editWizard: SourceSetEditWizard = new SourceSetEditWizard(this);
 
@@ -44,11 +40,8 @@ export class SourceSet extends Emitter {
         let variable = this.variables[name];
 
         if (!variable) {
-            const ref = nanoid();
-
             variable = this.variables[name] = {
                 name,
-                ref,
                 value,
             };
         }

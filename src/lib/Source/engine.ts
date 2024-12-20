@@ -1,8 +1,6 @@
 import luaBuiltins from "../../../stdlib/builtins.lua";
-import { nanoid } from "nanoid";
 import { LuaFactory } from "wasmoon";
 
-import { EditWizardField } from "@/lib/Source/SourceSetEditWizard";
 import { Source } from "@/lib/Source/index";
 import { logSourceLuaMessage } from "@/lib/styledLogs";
 
@@ -88,11 +86,8 @@ export async function createEngine({ source }: CreateEngineOpts) {
                 let variable = source.sourceSet!.variables[name];
 
                 if (!variable) {
-                    const ref = nanoid();
-
                     variable = source.sourceSet!.variables[name] = {
                         name,
-                        ref,
                         value: initialValue,
                     };
                 }
@@ -107,52 +102,7 @@ export async function createEngine({ source }: CreateEngineOpts) {
             },
         );
 
-        engine.global.set("editwizard", {
-            page: (id: string, name: string) => {
-                const page = source.sourceSet!.editWizard.pages[id] || {
-                    name,
-                    sections: {},
-                };
-
-                page.name = name;
-
-                source.sourceSet!.editWizard.pages[id] = page;
-            },
-            section: (id: string, name: string, page: string) => {
-                const pageObj = source.sourceSet!.editWizard.pages[page];
-
-                if (!pageObj) {
-                    throw new Error(`No page found with id '${page}'`);
-                }
-
-                const section = pageObj.sections[id] || { name, fields: {} };
-
-                section.name = name;
-
-                pageObj.sections[id] = section;
-            },
-            field: (
-                id: string,
-                options: EditWizardField & { page: string; section: string },
-            ) => {
-                const pageObj =
-                    source.sourceSet!.editWizard.pages[options.page];
-
-                if (!pageObj) {
-                    throw new Error(`No page found with id '${options.page}'`);
-                }
-
-                const section = pageObj.sections[options.section];
-
-                if (!section) {
-                    throw new Error(
-                        `No section found with id '${options.section}'`,
-                    );
-                }
-
-                section.fields[id] = options;
-            },
-        });
+        engine.global.set("editwizard", source.sourceSet?.editWizard);
     }
 
     await engine.doString(luaBuiltins);

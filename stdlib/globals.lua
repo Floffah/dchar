@@ -56,14 +56,29 @@ end
 --- Namespace containing functions for adding fields to the character sheet create/edit wizard
 editwizard = {}
 
---- Add a field to the character sheet create/edit wizard.
+--- Add a page to the character sheet create/edit wizard. Does nothing if the page already exists.
 ---@param id string
----@tparam FieldOptions options
-function editwizard.field(id, options)
+---@param name string
+---@treturn EditWizardPage
+function editwizard.page(id, name)
 end
 
---- Field options
----@table FieldOptions
+--- Edit Wizard Page
+---@table EditWizardPage
+---@field id string
+---@field name string
+---@field sections table<string, EditWizardSection>
+---@field section fun(id:string, name:string):EditWizardSection
+
+--- Edit Wizard Section 
+---@table EditWizardSection
+---@field id string
+---@field name string
+---@field fields table<string, EditWizardField>
+---@field field fun(id:string, options:FieldOptions):EditWizardField
+
+--- EditWizardField
+---@table EditWizardField
 ---@field label string - The label to display for the field
 ---@field[opt] description string - The description to display for the field
 ---@field type string - Field type, one of: "string", "textarea", "number", "boolean", "select", "multi-select"
@@ -76,16 +91,3 @@ end
 ---@field[opt=false] required boolean - Whether the field is required
 ---@field[opt] autoGenerate fun():any - Function to generate a value for the field. Displays a button to generate the value.
 ---@field[opt] validate fun(value:any):string|nil - Function to validate the value of the field. Returns an error message if the value is invalid.
-
---- Add a page to the character sheet create/edit wizard. Does nothing if the page already exists.
----@param id string
----@param name string
-function editwizard.page(id, name)
-end
-
---- Add a section to the character sheet create/edit wizard. Does nothing if the section already exists.
----@param id string
----@param name string
----@param page string
-function editwizard.section(id, name, page)
-end

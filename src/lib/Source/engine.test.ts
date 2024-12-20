@@ -182,7 +182,7 @@ describe("Edit wizard", () => {
 
         beforeAll(async () => {
             await mainSource.engine?.doString(
-                `editwizard.section("${sectionId}", "${name}", "${pageId}")`,
+                `editwizard.page("${pageId}").section("${sectionId}", "${name}", "${pageId}")`,
             );
         });
 
@@ -192,45 +192,19 @@ describe("Edit wizard", () => {
             ).toBe(name);
         });
 
-        test("Create a section on a nonexistent page", async () => {
-            await expect(
-                mainSource.engine?.doString(
-                    `editwizard.section("${sectionId}", "${name}", "nonexistent")`,
-                ),
-            ).rejects.toThrowError("No page found with id 'nonexistent'");
-        });
-
         describe("Fields", () => {
             const id = "test-field";
             const label = "Test Field";
 
             test("Create a field", async () => {
                 await mainSource.engine?.doString(
-                    `editwizard.field("${id}", { label = "${label}", type = "string", page = "${pageId}", section = "${sectionId}" })`,
+                    `editwizard.page("${pageId}").section("${sectionId}").field("${id}", { label = "${label}", type = "string", page = "${pageId}", section = "${sectionId}" })`,
                 );
 
                 expect(
                     sourceSet.editWizard.pages[pageId].sections[sectionId]
                         .fields[id].label,
                 ).toBe(label);
-            });
-
-            test("Create a field on a nonexistent page", async () => {
-                await expect(
-                    mainSource.engine?.doString(
-                        `editwizard.field("${id}", { label = "${label}", type = "string", page = "nonexistent", section = "${sectionId}" })`,
-                    ),
-                ).rejects.toThrowError("No page found with id 'nonexistent'");
-            });
-
-            test("Create a field on a nonexistent section", async () => {
-                await expect(
-                    mainSource.engine?.doString(
-                        `editwizard.field("${id}", { label = "${label}", type = "string", page = "${pageId}", section = "nonexistent" })`,
-                    ),
-                ).rejects.toThrowError(
-                    "No section found with id 'nonexistent'",
-                );
             });
         });
     });

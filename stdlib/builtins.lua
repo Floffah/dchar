@@ -25,7 +25,7 @@ builtinpages = {}
 
 --- The default character info page
 function builtinpages.info()
-    editwizard.page("character-info", "Character Info")
+    return editwizard.page("character-info", "Character Info")
 end
 
 --- Built in edit wizard sections
@@ -33,5 +33,5 @@ builtinsections = {}
 
 --- The default character details section
 function builtinsections.details()
-    editwizard.section("details", "Details", "character-info")
+    return builtinpages.info().section("details", "Details", "character-info")
 end

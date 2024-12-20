@@ -8,11 +8,11 @@ local Source = {
 function Source.onload()
     variable("characterName", "Chris P. Bacon", {type = "string"})
     
-    builtinpages.info()
+    local infoPage = builtinpages.info()
     
-    builtinsections.details()
+    local detailsSection = builtinsections.details()
     
-    editwizard.field("characterName", {
+    detailsSection.field("characterName", {
         label = "Character Name",
         type = "string",
         page = "character-info",

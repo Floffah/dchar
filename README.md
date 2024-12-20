@@ -4,7 +4,7 @@ Character creation app for dungeons and dragons (or other tabletops) that allows
 
 You can define custom game sources for almost anything via the lua engine. Supports the Fifth Edition core set and adventure supplements by default but you could implement the character sheet rules of any tabletop game.
 
-This is the first draft implementation of the app, and WILL be heavily refactored in the future.
+This is the first draft implementation of the app, and WILL be heavily refactored in the future. Some things are messy/broken/wrong, very much a work in progress.
 
 Client side only, backend planned for the future. However you can share character sheets as data is stored in the URL.
 
