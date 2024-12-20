@@ -20,14 +20,18 @@ function setvariable(name, value)
     variable(name).set(value)
 end
 
+--- Built in edit wizard pages
 builtinpages = {}
 
+--- The default character info page
 function builtinpages.info()
     editwizard.page("character-info", "Character Info")
 end
 
+--- Built in edit wizard sections
 builtinsections = {}
 
+--- The default character details section
 function builtinsections.details()
     editwizard.section("details", "Details", "character-info")
 end
