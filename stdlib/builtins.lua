@@ -19,3 +19,15 @@ end
 function setvariable(name, value)
     variable(name).set(value)
 end
+
+builtinpages = {
+    info = function() 
+        editwizard.page("character-info", "Character Info")
+    end
+}
+
+buildinsections = {
+    details = function()
+        editwizard.section("details", "Details", "character-info")
+    end
+}

@@ -16,6 +16,8 @@ const sourcesMeta = [];
 
 const sourcesDir = readdirSync(__dirname + "/../sources");
 
+sourcesDir.sort();
+
 for (const source of sourcesDir) {
     if (source.split(".").length > 1) {
         continue;

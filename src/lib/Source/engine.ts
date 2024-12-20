@@ -101,20 +101,9 @@ export async function createEngine({ source }: CreateEngineOpts) {
 
                 return {
                     ...variable,
-                    get: () => source.sourceSet!.variables[name].value,
+                    get: () => source.sourceSet?.getVariable(name),
                     set: (value: any) => {
-                        const oldValue = variable.value;
-
-                        source.sourceSet!.variables[name].value = value;
-
-                        if (source.sourceSet) {
-                            source.sourceSet.emit(
-                                "variablesChanged",
-                                name,
-                                oldValue,
-                                value,
-                            );
-                        }
+                        source.sourceSet?.setVariable(name, value);
                     },
                 };
             },

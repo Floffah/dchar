@@ -1,3 +1,15 @@
+# DnD Characters
+
+Character creation app for dungeons and dragons (or other tabletops) that allows you to create, save, and share characters (but all the calculations can be done for you)
+
+You can define custom game sources for almost anything via the lua engine. Supports the Fifth Edition core set and adventure supplements by default but you could implement the character sheet rules of any tabletop game.
+
+This is the first draft implementation of the app, and WILL be heavily refactored in the future.
+
+Client side only, backend planned for the future. However you can share character sheets as data is stored in the URL.
+
+# Create Next App
+
 This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
 
 ## Getting Started

@@ -82,7 +82,7 @@ export const Button = forwardRef<HTMLButtonElement, ButtonProps>(
 
                 {icon &&
                     !loading &&
-                    (typeof icon === "function" ? (
+                    (typeof icon === "function" || "render" in icon ? (
                         <Icon
                             className={clsx({
                                 "opacity-60": disabled,
@@ -114,11 +114,8 @@ export const Button = forwardRef<HTMLButtonElement, ButtonProps>(
                     ref={ref as any}
                     className={clsx(
                         className,
-                        "transition-[opacity,color,background-color] duration-150",
+                        "flex h-fit items-center justify-center space-x-1 transition-[opacity,color,background-color] duration-150",
                         {
-                            "flex h-fit items-center justify-center space-x-1":
-                                !asChild,
-
                             "pointer-events-none cursor-not-allowed opacity-60":
                                 disabled,
 

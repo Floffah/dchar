@@ -8,9 +8,9 @@ local Source = {
 function Source.onload()
     variable("characterName", "Chris P. Bacon", {type = "string"})
     
-    editwizard.page("character-info", "Character Info")
+    builtinpages.info()
     
-    editwizard.section("details", "Details", "character-info")
+    builtinsections.details()
     
     editwizard.field("characterName", {
         label = "Character Name",

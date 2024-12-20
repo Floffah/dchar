@@ -39,10 +39,6 @@ export class Source {
     async load() {
         logSourceSystemMessage(this, `Loading source by id '${this.id}'`);
 
-        if (this.sourceSet && !this.sourceSet.sources.includes(this)) {
-            this.sourceSet.sources.push(this);
-        }
-
         this.engine = await createEngine({
             source: this,
         });

@@ -34,10 +34,10 @@ export function CreateCharacterForm() {
     const onSubmit = async (values: FormValues) => {
         router.prefetch("/character");
 
-        await sources.unload();
+        await sources.sourceSet.unload();
 
         try {
-            await sources.loadSource(values.source);
+            await sources.sourceSet.loadSource(values.source);
         } catch (_e) {
             console.log(_e);
             form.setError("source", {
@@ -46,7 +46,7 @@ export function CreateCharacterForm() {
             return;
         }
 
-        const source = sources.sources.find(
+        const source = sources.sourceSet.sources.find(
             (source) => source.id === values.source,
         );
 
@@ -54,9 +54,14 @@ export function CreateCharacterForm() {
             `setvariable("characterName", ${JSON.stringify(values.name)})`,
         );
 
+        sources.sourceSet.emit("loaded");
+
         const searchParams = new URLSearchParams();
 
-        searchParams.set("data", btoa(JSON.stringify(sources.save())));
+        searchParams.set(
+            "data",
+            btoa(JSON.stringify(sources.sourceSet.save())),
+        );
 
         router.push("/character?" + searchParams.toString());
     };
@@ -69,9 +74,14 @@ export function CreateCharacterForm() {
         >
             <h1 className="text-xl font-bold">Create a new character</h1>
 
-            <Form.Input name="name" label="Character Name" />
+            <Form.Input
+                name="name"
+                label="Character Name"
+                placeholder="Chris P. Bacon"
+            />
 
             <FormField name="source" label="Choose a source">
+                {/* TODO: convert to radio list */}
                 {sourcesMeta.sources
                     .filter((source) => !source.lib)
                     .map((source) => (
