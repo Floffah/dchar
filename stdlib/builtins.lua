@@ -20,14 +20,14 @@ function setvariable(name, value)
     variable(name).set(value)
 end
 
-builtinpages = {
-    info = function() 
-        editwizard.page("character-info", "Character Info")
-    end
-}
+builtinpages = {}
 
-buildinsections = {
-    details = function()
-        editwizard.section("details", "Details", "character-info")
-    end
-}
+function builtinpages.info()
+    editwizard.page("character-info", "Character Info")
+end
+
+builtinsections = {}
+
+function builtinsections.details()
+    editwizard.section("details", "Details", "character-info")
+end

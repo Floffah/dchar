@@ -23,8 +23,6 @@ export async function createEngine({ source }: CreateEngineOpts) {
         openStandardLibs: false,
     });
 
-    await engine.doString(luaBuiltins);
-
     // std lib stuff
     engine.global.set("print", (...args: any[]) => {
         logSourceLuaMessage(source, args.join("\t"));
@@ -156,6 +154,8 @@ export async function createEngine({ source }: CreateEngineOpts) {
             },
         });
     }
+
+    await engine.doString(luaBuiltins);
 
     return engine;
 }
