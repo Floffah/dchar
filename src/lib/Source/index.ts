@@ -9,7 +9,7 @@ import { logSourceSystemMessage } from "@/lib/styledLogs";
 
 interface SourceOpts {
     resolver?: SourceResolver;
-    set?: SourceSet;
+    set: SourceSet;
 }
 
 export class Source {
@@ -21,7 +21,7 @@ export class Source {
     public engine: LuaEngine | null = null;
 
     public resolver: SourceResolver;
-    public sourceSet: SourceSet | null = null;
+    public sourceSet: SourceSet;
 
     public main: SourceFile | null = null;
     public allSources: SourceFile[] = [];
@@ -33,7 +33,14 @@ export class Source {
         { resolver = new HTTPSourceResolver(), set }: SourceOpts,
     ) {
         this.resolver = resolver;
-        this.sourceSet = set ?? null;
+
+        if (!set) {
+            throw new Error(
+                "Initialising a source without a source set is no longer supported",
+            );
+        }
+
+        this.sourceSet = set;
     }
 
     async load() {

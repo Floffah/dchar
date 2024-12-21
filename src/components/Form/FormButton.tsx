@@ -15,8 +15,10 @@ import { FormContext } from "@/components/Form/index";
 
 export const FormButton = forwardRef<
     ComponentRef<typeof Button>,
-    ComponentProps<typeof Button>
->(({ onClick, ...props }, externalRef) => {
+    ComponentProps<typeof Button> & {
+        onAfterSubmit?: () => void | Promise<void>;
+    }
+>(({ onClick, onAfterSubmit, ...props }, externalRef) => {
     "use client";
 
     const { form, disabled: formDisabled, submit } = useContext(FormContext);
@@ -45,6 +47,7 @@ export const FormButton = forwardRef<
                         props.type !== "reset"
                     ) {
                         await submit(e);
+                        await onAfterSubmit?.();
                     }
                 })
             }

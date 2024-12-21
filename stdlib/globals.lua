@@ -81,6 +81,7 @@ end
 ---@table EditWizardField
 ---@field label string - The label to display for the field
 ---@field[opt] description string - The description to display for the field
+---@field[opt] placeholder string - The placeholder to display for the field
 ---@field type string - Field type, one of: "string", "textarea", "number", "boolean", "select", "multi-select"
 ---@field page string - The id of a page to display the field on
 ---@field section string - The id of a section to display the field in

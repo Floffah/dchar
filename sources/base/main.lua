@@ -8,7 +8,7 @@ local Source = {
 function Source.onload()
     variable("characterName", "Chris P. Bacon", {type = "string"})
     
-    local infoPage = builtinpages.info()
+    builtinpages.info()
     
     local detailsSection = builtinsections.details()
     

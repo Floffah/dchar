@@ -39,7 +39,6 @@ export function CreateCharacterForm() {
         try {
             await sources.sourceSet.loadSource(values.source);
         } catch (_e) {
-            console.log(_e);
             form.setError("source", {
                 message: "Failed to load source",
             });

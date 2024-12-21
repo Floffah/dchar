@@ -126,7 +126,7 @@ export const Button = forwardRef<HTMLButtonElement, ButtonProps>(
                                 color === "primary",
                             "bg-green-500 text-white dark:bg-green-700":
                                 color === "success",
-                            "border border-black/10 bg-black/5 text-black dark:border-white/10 dark:bg-white/5 dark:text-white":
+                            "bg-black/10 text-black dark:bg-white/10 dark:text-white":
                                 color === "secondary",
                             "bg-red-500 text-white dark:bg-red-800":
                                 color === "danger",

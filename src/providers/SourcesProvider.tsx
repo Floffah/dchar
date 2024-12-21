@@ -44,6 +44,10 @@ export function SourcesProvider({ children }: PropsWithChildren) {
 
     useEffect(() => {
         const onSomethingChanged = async () => {
+            if (isLoading) {
+                return;
+            }
+
             const params = new URLSearchParams(window.location.search);
 
             if (!params.has("data")) {
@@ -66,7 +70,7 @@ export function SourcesProvider({ children }: PropsWithChildren) {
             sourceSet.off("sourcesChanged", onSomethingChanged);
             sourceSet.off("loaded", onLoaded);
         };
-    }, [sourceSet]);
+    }, [isLoading, sourceSet]);
 
     return (
         <SourceContext.Provider value={{ sourceSet, isLoading }}>

@@ -79,31 +79,29 @@ export async function createEngine({ source }: CreateEngineOpts) {
         return sourceFile.isLoaded;
     });
 
-    if (source.sourceSet) {
-        engine.global.set(
-            "variable",
-            (name: string, initialValue: any, _opts: any) => {
-                let variable = source.sourceSet!.variables[name];
+    engine.global.set(
+        "variable",
+        (name: string, initialValue: any, _opts: any) => {
+            let variable = source.sourceSet!.variables[name];
 
-                if (!variable) {
-                    variable = source.sourceSet!.variables[name] = {
-                        name,
-                        value: initialValue,
-                    };
-                }
-
-                return {
-                    ...variable,
-                    get: () => source.sourceSet?.getVariable(name),
-                    set: (value: any) => {
-                        source.sourceSet?.setVariable(name, value);
-                    },
+            if (!variable) {
+                variable = source.sourceSet!.variables[name] = {
+                    name,
+                    value: initialValue,
                 };
-            },
-        );
+            }
 
-        engine.global.set("editwizard", source.sourceSet?.editWizard);
-    }
+            return {
+                ...variable,
+                get: () => source.sourceSet?.getVariable(name),
+                set: (value: any) => {
+                    source.sourceSet?.setVariable(name, value);
+                },
+            };
+        },
+    );
+
+    engine.global.set("editwizard", source.sourceSet?.editWizard);
 
     await engine.doString(luaBuiltins);
 

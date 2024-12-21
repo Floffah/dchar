@@ -9,6 +9,7 @@ import EyeIcon from "~icons/mdi/eye-outline";
 import HomeIcon from "~icons/mdi/home-outline";
 import PencilIcon from "~icons/mdi/pencil-outline";
 
+import { EditCharacter } from "@/app/character/EditCharacter";
 import { Button } from "@/components/Button";
 import { Loader } from "@/components/Loader";
 import { useSources } from "@/providers/SourcesProvider";
@@ -37,7 +38,10 @@ export default function CharacterPage() {
     }
 
     return (
-        <Tabs.Root className="flex h-screen flex-col p-4" defaultValue="edit">
+        <Tabs.Root
+            className="flex h-screen flex-col gap-4 p-4"
+            defaultValue="edit"
+        >
             <header className="flex items-center gap-2 rounded-lg bg-gray-200 p-2 dark:bg-gray-800">
                 <Button size="sm" color="secondary" icon={HomeIcon} asChild>
                     <Link href="/">Home</Link>
@@ -82,8 +86,11 @@ export default function CharacterPage() {
                 </p>
             </Tabs.Content>
 
-            <Tabs.Content value="edit" className="flex flex-col gap-2">
-                {/* TODO: implement */}
+            <Tabs.Content
+                value="edit"
+                className="flex flex-grow flex-col gap-2"
+            >
+                <EditCharacter />
             </Tabs.Content>
         </Tabs.Root>
     );

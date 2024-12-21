@@ -6,7 +6,11 @@ export class SourceSetEditWizard {
     constructor(public sourceSet: SourceSet) {}
 
     public page(id: string, name: string) {
-        const page = this.pages[id] || new SourceSetEditWizardPage(id, name);
+        console.log(id, name);
+
+        const page =
+            this.pages[id] ||
+            new SourceSetEditWizardPage(id, name, this.sourceSet);
 
         if (name) {
             page.name = name;
@@ -24,11 +28,13 @@ export class SourceSetEditWizardPage {
     constructor(
         public id: string,
         public name: string,
+        public sourceSet: SourceSet,
     ) {}
 
     public section(id: string, name: string) {
         const section =
-            this.sections[id] || new SourceSetEditWizardSection(id, name);
+            this.sections[id] ||
+            new SourceSetEditWizardSection(id, name, this.sourceSet);
 
         if (name) {
             section.name = name;
@@ -46,10 +52,15 @@ class SourceSetEditWizardSection {
     constructor(
         public id: string,
         public name: string,
+        public sourceSet: SourceSet,
     ) {}
 
     public field(id: string, options: EditWizardFieldOptions) {
-        return (this.fields[id] = new EditWizardField(id, options));
+        return (this.fields[id] = new EditWizardField(
+            id,
+            options,
+            this.sourceSet,
+        ));
     }
 }
 
@@ -63,6 +74,7 @@ interface EditWizardFieldOptions {
         | "select"
         | "mutli-select";
     description?: string;
+    placeholder?: string;
     variable?: string;
     onchange?: (value: any) => void;
     options?: Record<string, string>;
@@ -82,6 +94,7 @@ export class EditWizardField implements EditWizardFieldOptions {
         | "select"
         | "mutli-select";
     description?: string;
+    placeholder?: string;
     variable?: string;
     onchange?: (value: any) => void;
     options?: Record<string, string>;
@@ -93,10 +106,12 @@ export class EditWizardField implements EditWizardFieldOptions {
     constructor(
         public id: string,
         options: EditWizardFieldOptions,
+        public sourceSet: SourceSet,
     ) {
         this.label = options.label;
         this.type = options.type;
         this.description = options.description;
+        this.placeholder = options.placeholder;
         this.variable = options.variable;
         this.onchange = options.onchange;
         this.options = options.options;
