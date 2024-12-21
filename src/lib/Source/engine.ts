@@ -34,11 +34,12 @@ export async function createEngine({ source }: CreateEngineOpts) {
         let fromSource: Source | undefined = source;
 
         if (sourceId) {
-            if (!source.sourceSet) {
-                throw new Error(
-                    "Source must be part of a SourceSet to use 'sourceId'",
-                );
-            }
+            // Files are no longer run unless the source is within a SourceSet
+            // if (!source.sourceSet) {
+            //     throw new Error(
+            //         "Source must be part of a SourceSet to use 'sourceId'",
+            //     );
+            // }
 
             fromSource = source.sourceSet.sources.find(
                 (source) => source.id === sourceId,

@@ -115,19 +115,20 @@ describe("Requiring", () => {
         ).rejects.toThrowError("No source found with id 'nonexistent'");
     });
 
-    test("Require with sourceId without a SourceSet", async () => {
-        const standaloneSource = new Source("test", { resolver });
-
-        await standaloneSource.load();
-
-        await expect(
-            standaloneSource.engine?.doString(
-                `return require("main.lua", "base")`,
-            ),
-        ).rejects.toThrowError(
-            "Source must be part of a SourceSet to use 'sourceId'",
-        );
-    });
+    // test("Require with sourceId without a SourceSet", async () => {
+    //     const standaloneSource = new Source("test", { resolver });
+    //
+    //     await standaloneSource.load();
+    //
+    //     await expect(
+    //         standaloneSource.engine?.doString(
+    //             `return require("main.lua", "base")`,
+    //         ),
+    //     ).rejects.toThrowError(
+    //         // "Source must be part of a SourceSet to use 'sourceId'",
+    //         "Initialising a source without a source set is no longer supported",
+    //     );
+    // });
 });
 
 test("Printing", async () => {
