@@ -23,7 +23,7 @@ for (const source of sourcesDir) {
     if (existsSync(mainPath)) {
         const meta = await engine.doString(readFileSync(mainPath, "utf-8"));
 
-        // sory keys
+        // sorted keys
         const keys = Object.keys(meta).sort();
         const sortedMeta: any = {};
 

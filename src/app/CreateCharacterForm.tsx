@@ -9,6 +9,7 @@ import sourcesMeta from "~sources";
 
 import { Form } from "@/components/Form";
 import { FormField } from "@/components/Form/FormField";
+import { saveSourceSet, serializeSourceSet } from "@/lib/Source/persistence";
 import { CharacterSheetVariableConstants } from "@/lib/constants";
 import { useSources } from "@/providers/SourcesProvider";
 
@@ -46,22 +47,18 @@ export function CreateCharacterForm() {
             return;
         }
 
-        const source = sources.sourceSet.sources.find(
-            (source) => source.id === values.source,
-        );
-
-        await source?.engine?.doString(
-            `setvariable("${CharacterSheetVariableConstants.CHARACTER_NAME}", ${JSON.stringify(values.name)})`,
+        sources.sourceSet.setVariable(
+            CharacterSheetVariableConstants.CHARACTER_NAME,
+            values.name,
         );
 
         sources.sourceSet.emit("loaded");
 
+        saveSourceSet(sources.sourceSet, false);
+
         const searchParams = new URLSearchParams();
 
-        searchParams.set(
-            "data",
-            btoa(JSON.stringify(sources.sourceSet.save())),
-        );
+        searchParams.set("data", serializeSourceSet(sources.sourceSet));
 
         router.push("/character?" + searchParams.toString());
     };
