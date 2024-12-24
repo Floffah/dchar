@@ -1,4 +1,5 @@
 import { SavableSourceSet, SourceSet } from "@/lib/Source/SourceSet";
+import { CharacterSheetVariableConstants } from "@/lib/constants";
 
 export function serializeSavableSourceSet(sourceSet: SavableSourceSet) {
     return btoa(JSON.stringify(sourceSet));
@@ -12,7 +13,7 @@ export function deserializeSourceSet(data: string) {
     return JSON.parse(atob(data)) as SavableSourceSet;
 }
 
-const CHARACTER_LIST = "characterList";
+export const CHARACTER_LIST = "characterList";
 
 export function saveSourceSet(sourceSet: SourceSet, withURL = true) {
     if (withURL) {
@@ -36,10 +37,17 @@ export function saveSourceSet(sourceSet: SourceSet, withURL = true) {
             const saved = deserializeSourceSet(data);
 
             return (
-                !saved.variables["characterName"] ||
-                !sourceSet.variables["characterName"] ||
-                saved.variables["characterName"].value !==
-                    sourceSet.variables["characterName"].value
+                !saved.variables[
+                    CharacterSheetVariableConstants.CHARACTER_NAME
+                ] ||
+                !sourceSet.variables[
+                    CharacterSheetVariableConstants.CHARACTER_NAME
+                ] ||
+                saved.variables[CharacterSheetVariableConstants.CHARACTER_NAME]
+                    .value !==
+                    sourceSet.variables[
+                        CharacterSheetVariableConstants.CHARACTER_NAME
+                    ].value
             );
         });
 

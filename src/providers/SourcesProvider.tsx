@@ -1,5 +1,6 @@
 "use client";
 
+import { useMutation } from "@tanstack/react-query";
 import { usePathname } from "next/navigation";
 import {
     PropsWithChildren,
@@ -7,11 +8,11 @@ import {
     useContext,
     useEffect,
     useMemo,
-    useState,
 } from "react";
 
-import { SourceSet } from "@/lib/Source/SourceSet";
+import { SavableSourceSet, SourceSet } from "@/lib/Source/SourceSet";
 import { deserializeSourceSet, saveSourceSet } from "@/lib/Source/persistence";
+import { CharacterSheetVariableConstants } from "@/lib/constants";
 
 const SourceContext = createContext<{
     sourceSet: SourceSet;
@@ -24,27 +25,41 @@ export function SourcesProvider({ children }: PropsWithChildren) {
     const pathname = usePathname();
 
     const sourceSet = useMemo(() => new SourceSet(), []);
-    const [isLoading, setIsLoading] = useState(true);
+
+    const loadSourceSetMutation = useMutation({
+        mutationKey: ["loadSourceSet"],
+        mutationFn: async (data: SavableSourceSet) => {
+            return await sourceSet.load(data);
+        },
+    });
 
     useEffect(() => {
+        if (loadSourceSetMutation.isPending) {
+            return;
+        }
+
         const params = new URLSearchParams(window.location.search);
 
         if (params.has("data")) {
-            const abortController = new AbortController();
-
             const data = deserializeSourceSet(params.get("data")!);
 
-            sourceSet.load(data, { signal: abortController.signal });
+            if (
+                data.variables[CharacterSheetVariableConstants.CHARACTER_NAME]
+                    .value ===
+                sourceSet?.variables?.[
+                    CharacterSheetVariableConstants.CHARACTER_NAME
+                ]?.value
+            ) {
+                return;
+            }
 
-            return () => {
-                abortController.abort();
-            };
+            loadSourceSetMutation.mutate(data);
         }
-    }, [pathname]);
+    }, [loadSourceSetMutation.isPending, pathname, sourceSet.variables]);
 
     useEffect(() => {
         const onSomethingChanged = async () => {
-            if (isLoading) {
+            if (loadSourceSetMutation.isPending) {
                 return;
             }
 
@@ -57,23 +72,19 @@ export function SourcesProvider({ children }: PropsWithChildren) {
             saveSourceSet(sourceSet);
         };
 
-        const onLoaded = () => {
-            setIsLoading(false);
-        };
-
-        sourceSet.on("variablesChanged", onSomethingChanged);
+        sourceSet.on("variableChanged", onSomethingChanged);
         sourceSet.on("sourcesChanged", onSomethingChanged);
-        sourceSet.on("loaded", onLoaded);
 
         return () => {
-            sourceSet.off("variablesChanged", onSomethingChanged);
+            sourceSet.off("variableChanged", onSomethingChanged);
             sourceSet.off("sourcesChanged", onSomethingChanged);
-            sourceSet.off("loaded", onLoaded);
         };
-    }, [isLoading, sourceSet]);
+    }, [loadSourceSetMutation.isPending, sourceSet]);
 
     return (
-        <SourceContext.Provider value={{ sourceSet, isLoading }}>
+        <SourceContext.Provider
+            value={{ sourceSet, isLoading: loadSourceSetMutation.isPending }}
+        >
             {children}
         </SourceContext.Provider>
     );

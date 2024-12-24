@@ -12,11 +12,17 @@ import PencilIcon from "~icons/mdi/pencil-outline";
 import { EditCharacter } from "@/app/character/EditCharacter";
 import { Button } from "@/components/Button";
 import { Loader } from "@/components/Loader";
+import { useVariable } from "@/hooks/sources";
+import { CharacterSheetVariableConstants } from "@/lib/constants";
 import { useSources } from "@/providers/SourcesProvider";
 
 export default function CharacterPage() {
     const router = useRouter();
     const sources = useSources();
+
+    const characterName = useVariable(
+        CharacterSheetVariableConstants.CHARACTER_NAME,
+    );
 
     useEffect(() => {
         const params = new URLSearchParams(window.location.search);
@@ -51,9 +57,7 @@ export default function CharacterPage() {
                     Character Sheet
                 </div>
 
-                <h1 className="text-xl font-bold">
-                    {sources.sourceSet.getVariable("characterName")}
-                </h1>
+                <h1 className="text-xl font-bold">{characterName}</h1>
 
                 <div className="flex-grow" />
 

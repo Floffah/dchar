@@ -2,6 +2,7 @@ import { describe, expect, test } from "bun:test";
 
 import { SavableSourceSet, SourceSet } from "@/lib/Source/SourceSet";
 import { TestSourceResolver } from "@/lib/Source/resolver/TestSourceResolver";
+import { CharacterSheetVariableConstants } from "@/lib/constants";
 
 describe("Saving", () => {
     let savedSource: SavableSourceSet;
@@ -11,7 +12,9 @@ describe("Saving", () => {
 
         await sourceSet.loadSource("5e");
 
-        sourceSet.variables["characterName"].value = "Test Character";
+        sourceSet.variables[
+            CharacterSheetVariableConstants.CHARACTER_NAME
+        ].value = "Test Character";
 
         savedSource = sourceSet.save();
 
@@ -23,8 +26,9 @@ describe("Saving", () => {
 
         await sourceSet.load(savedSource);
 
-        expect(sourceSet.variables["characterName"].value).toBe(
-            "Test Character",
-        );
+        expect(
+            sourceSet.variables[CharacterSheetVariableConstants.CHARACTER_NAME]
+                .value,
+        ).toBe("Test Character");
     });
 });

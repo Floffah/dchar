@@ -1,8 +1,18 @@
-import { ReactNode, useEffect, useMemo, useState } from "react";
+import { ReactNode, useEffect, useState } from "react";
 import { useForm } from "react-hook-form";
 
 import { Form } from "@/components/Form";
+import { useVariable } from "@/hooks/sources";
 import { SourceSetEditWizardPage } from "@/lib/Source/SourceSetEditWizard";
+import {
+    CHARACTER_LIST,
+    getSavedSourceSets,
+    serializeSavableSourceSet,
+} from "@/lib/Source/persistence";
+import {
+    CharacterSheetSectionConstants,
+    CharacterSheetVariableConstants,
+} from "@/lib/constants";
 
 function getDefaultValuesForPage(page: SourceSetEditWizardPage) {
     const defaultValues: Record<string, any> = {};
@@ -31,13 +41,26 @@ export function EditCharacterPage({
     hasNext: boolean;
     onRequestNextPage: () => void;
 }) {
-    const defaultValues = useMemo(() => getDefaultValuesForPage(page), [page]);
+    const characterName = useVariable(
+        CharacterSheetVariableConstants.CHARACTER_NAME,
+    );
+
+    const [defaultValues, setDefaultValues] = useState(() =>
+        getDefaultValuesForPage(page),
+    );
 
     const form = useForm({
         defaultValues,
     });
 
     const [justSubmitted, setJustSubmitted] = useState(false);
+
+    const reset = () => {
+        const newDefaultValues = getDefaultValuesForPage(page);
+        setDefaultValues(newDefaultValues);
+
+        form.reset(newDefaultValues);
+    };
 
     const onSubmit = async (values: any) => {
         const variablesToSet: Record<string, any> = {};
@@ -67,6 +90,47 @@ export function EditCharacterPage({
             }
         }
 
+        if (
+            CharacterSheetVariableConstants.CHARACTER_NAME in variablesToSet &&
+            variablesToSet[CharacterSheetVariableConstants.CHARACTER_NAME] !==
+                defaultValues[CharacterSheetVariableConstants.CHARACTER_NAME]
+        ) {
+            const savedSets = getSavedSourceSets();
+
+            if (
+                savedSets.some(
+                    (set) =>
+                        set.variables[
+                            CharacterSheetVariableConstants.CHARACTER_NAME
+                        ].value === variablesToSet.characterName,
+                )
+            ) {
+                form.setError(
+                    CharacterSheetSectionConstants.DETAILS +
+                        ":" +
+                        CharacterSheetVariableConstants.CHARACTER_NAME,
+                    {
+                        message: "Character name already exists",
+                    },
+                );
+                return;
+            }
+
+            const newSavedSets = savedSets.filter(
+                (set) =>
+                    set.variables[
+                        CharacterSheetVariableConstants.CHARACTER_NAME
+                    ].value !== characterName,
+            );
+
+            localStorage.setItem(
+                CHARACTER_LIST,
+                JSON.stringify(
+                    newSavedSets.map((set) => serializeSavableSourceSet(set)),
+                ),
+            );
+        }
+
         for (const [name, value] of Object.entries(variablesToSet)) {
             page.sourceSet.setVariable(name, value);
         }
@@ -74,6 +138,8 @@ export function EditCharacterPage({
         await new Promise((resolve) => setTimeout(resolve, 1000));
 
         setJustSubmitted(true);
+
+        reset();
     };
 
     const renderSections = () => {

@@ -13,7 +13,7 @@ export interface SavableSourceSet {
 
 type SourceSetEvents = {
     sourcesChanged: () => void;
-    variablesChanged: (name: string, oldValue: any, newValue: any) => void;
+    variableChanged: (name: string, oldValue: any, newValue: any) => void;
     editWizardChanged: () => void;
     loaded: () => void;
 };
@@ -50,7 +50,7 @@ export class SourceSet extends Emitter {
 
         variable.value = value;
 
-        this.emit("variablesChanged", name, oldValue, value);
+        this.emit("variableChanged", name, oldValue, value);
 
         return variable;
     }

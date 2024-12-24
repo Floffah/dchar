@@ -2,10 +2,6 @@ import { readFileSync } from "fs";
 import { existsSync, readdirSync } from "node:fs";
 import { LuaFactory } from "wasmoon";
 
-import { Source } from "@/lib/Source";
-import { SourceSet } from "@/lib/Source/SourceSet";
-import { createEngine } from "@/lib/Source/engine";
-
 const factory = new LuaFactory();
 const engine = await factory.createEngine({
     enableProxy: true,
@@ -27,9 +23,17 @@ for (const source of sourcesDir) {
     if (existsSync(mainPath)) {
         const meta = await engine.doString(readFileSync(mainPath, "utf-8"));
 
+        // sory keys
+        const keys = Object.keys(meta).sort();
+        const sortedMeta: any = {};
+
+        for (const key of keys) {
+            sortedMeta[key] = meta[key];
+        }
+
         sourcesMeta.push({
-            ...meta,
             id: source,
+            ...sortedMeta,
         });
     }
 }

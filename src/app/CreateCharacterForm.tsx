@@ -9,6 +9,7 @@ import sourcesMeta from "~sources";
 
 import { Form } from "@/components/Form";
 import { FormField } from "@/components/Form/FormField";
+import { CharacterSheetVariableConstants } from "@/lib/constants";
 import { useSources } from "@/providers/SourcesProvider";
 
 const formSchema = object({
@@ -50,7 +51,7 @@ export function CreateCharacterForm() {
         );
 
         await source?.engine?.doString(
-            `setvariable("characterName", ${JSON.stringify(values.name)})`,
+            `setvariable("${CharacterSheetVariableConstants.CHARACTER_NAME}", ${JSON.stringify(values.name)})`,
         );
 
         sources.sourceSet.emit("loaded");

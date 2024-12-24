@@ -10,6 +10,7 @@
     "prepare": "bun run scripts/introspectSources.ts"
   },
   "dependencies": {
+    "@formkit/auto-animate": "^0.8.2",
     "@hookform/resolvers": "^3.9.1",
     "@radix-ui/react-accessible-icon": "^1.1.1",
     "@radix-ui/react-popover": "^1.1.4",
@@ -17,8 +18,8 @@
     "@radix-ui/react-separator": "^1.1.1",
     "@radix-ui/react-slot": "^1.1.1",
     "@radix-ui/react-tabs": "^1.1.2",
-    "@tanstack/react-query": "^5.62.8",
-    "chalk": "^5.4.0",
+    "@tanstack/react-query": "^5.62.10",
+    "chalk": "^5.4.1",
     "clsx": "^2.1.1",
     "nanoid": "^5.0.9",
     "next": "15.1.2",
@@ -31,7 +32,7 @@
   },
   "devDependencies": {
     "@eslint/eslintrc": "^3.2.0",
-    "@iconify/json": "^2.2.286",
+    "@iconify/json": "^2.2.288",
     "@svgr/core": "^8.1.0",
     "@svgr/plugin-jsx": "^8.1.0",
     "@trivago/prettier-plugin-sort-imports": "^5.2.0",

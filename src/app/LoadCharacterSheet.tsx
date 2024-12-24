@@ -10,6 +10,7 @@ import {
     getSavedSourceSets,
     serializeSavableSourceSet,
 } from "@/lib/Source/persistence";
+import { CharacterSheetVariableConstants } from "@/lib/constants";
 
 export function LoadCharacterSheet() {
     const existingCharacters = useQuery({
@@ -17,6 +18,7 @@ export function LoadCharacterSheet() {
         queryFn: async () => {
             return getSavedSourceSets();
         },
+        staleTime: 0,
     });
 
     return (
@@ -35,7 +37,9 @@ export function LoadCharacterSheet() {
                 <div className="flex flex-col gap-2 overflow-y-auto">
                     {existingCharacters.data.map((character) => {
                         const name =
-                            character.variables["characterName"]?.value;
+                            character.variables[
+                                CharacterSheetVariableConstants.CHARACTER_NAME
+                            ]?.value;
 
                         if (!name) {
                             return null;
