@@ -7,6 +7,16 @@ local Source = {
 }
 
 function Source.onload()
+    variable("characterBackstory", "Once upon a time...")
+    
+    local detailsSection = builtinsections.details()
+    
+    detailsSection.field("characterBackstory", {
+        label = "Character Backstory",
+        type = "textarea",
+        variable = "characterBackstory",
+        default = "Once upon a time...",
+    })
 end
 
 return Source

@@ -43,13 +43,15 @@ export function SourcesProvider({ children }: PropsWithChildren) {
         if (params.has("data")) {
             const data = deserializeSourceSet(params.get("data")!);
 
-            if (
+            const dataCharacterName =
                 data.variables[CharacterSheetVariableConstants.CHARACTER_NAME]
-                    .value ===
+                    .value;
+            const sourceSetCharacterName =
                 sourceSet?.variables?.[
                     CharacterSheetVariableConstants.CHARACTER_NAME
-                ]?.value
-            ) {
+                ]?.value;
+
+            if (dataCharacterName === sourceSetCharacterName) {
                 return;
             }
 

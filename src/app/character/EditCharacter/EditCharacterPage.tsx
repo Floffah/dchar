@@ -159,6 +159,18 @@ export function EditCharacterPage({
                             required={field.required}
                         />,
                     );
+                } else if (field.type === "textarea") {
+                    fields.push(
+                        <Form.TextArea
+                            key={field.id}
+                            name={section.id + ":" + field.id}
+                            label={field.label}
+                            description={field.description}
+                            required={field.required}
+                            minRows={3}
+                            maxRows={6}
+                        />,
+                    );
                 }
             }
 
@@ -183,28 +195,32 @@ export function EditCharacterPage({
     }, [justSubmitted]);
 
     return (
-        <Form
-            form={form}
-            submitHandler={onSubmit}
-            className="flex flex-grow flex-col rounded-lg bg-gray-200 p-4 dark:bg-gray-800"
-        >
-            {renderSections()}
-            <div className="flex-grow" />
-            <div className="flex items-center justify-end gap-2">
-                {justSubmitted && <p className="text-green-500">Saved!</p>}
-                <Form.Button color="primary" size="md" className="w-fit">
-                    Save
-                </Form.Button>
-                <Form.Button
-                    color="secondary"
-                    size="md"
-                    className="w-fit"
-                    disabled={!hasNext}
-                    onAfterSubmit={onRequestNextPage}
-                >
-                    Save & Next Page
-                </Form.Button>
-            </div>
-        </Form>
+        <div className="flex flex-grow justify-center rounded-lg bg-gray-200 p-4 dark:bg-gray-800">
+            <Form
+                form={form}
+                submitHandler={onSubmit}
+                className="flex flex-grow flex-col sm:max-w-md"
+            >
+                {renderSections()}
+
+                <div className="flex-grow" />
+
+                <div className="flex items-center justify-end gap-2">
+                    {justSubmitted && <p className="text-green-500">Saved!</p>}
+                    <Form.Button color="primary" size="md" className="w-fit">
+                        Save
+                    </Form.Button>
+                    <Form.Button
+                        color="secondary"
+                        size="md"
+                        className="w-fit"
+                        disabled={!hasNext}
+                        onAfterSubmit={onRequestNextPage}
+                    >
+                        Save & Next Page
+                    </Form.Button>
+                </div>
+            </Form>
+        </div>
     );
 }

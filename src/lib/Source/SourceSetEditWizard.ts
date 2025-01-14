@@ -6,8 +6,6 @@ export class SourceSetEditWizard {
     constructor(public sourceSet: SourceSet) {}
 
     public page(id: string, name: string) {
-        console.log(id, name);
-
         const page =
             this.pages[id] ||
             new SourceSetEditWizardPage(id, name, this.sourceSet);
@@ -56,11 +54,16 @@ class SourceSetEditWizardSection {
     ) {}
 
     public field(id: string, options: EditWizardFieldOptions) {
-        return (this.fields[id] = new EditWizardField(
-            id,
-            options,
-            this.sourceSet,
-        ));
+        const field =
+            this.fields[id] || new EditWizardField(id, options, this.sourceSet);
+
+        if (options.label) {
+            field.label = options.label;
+        } else if (!this.fields[id]) {
+            throw new Error("Label is required for new fields");
+        }
+
+        return (this.fields[id] = field);
     }
 }
 

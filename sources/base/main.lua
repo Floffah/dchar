@@ -6,7 +6,7 @@ local Source = {
 }
 
 function Source.onload()
-    variable("characterName", "Chris P. Bacon", {type = "string"})
+    variable("characterName", "Chris P. Bacon")
     
     builtinpages.info()
     
@@ -15,8 +15,6 @@ function Source.onload()
     detailsSection.field("characterName", {
         label = "Character Name",
         type = "string",
-        page = "character-info",
-        section = "details",
         variable = "characterName",
         default = "Chris P. Bacon",
     })
