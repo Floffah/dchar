@@ -1,3 +1,4 @@
+import stylex from "@stylexjs/stylex";
 import { ReactNode, useEffect, useState } from "react";
 import { useForm } from "react-hook-form";
 
@@ -13,6 +14,10 @@ import {
     CharacterSheetSectionConstants,
     CharacterSheetVariableConstants,
 } from "@/lib/constants";
+import { colours } from "@/styles/colours.stylex";
+import { fontSizes, fontWeights, lineHeights } from "@/styles/fonts.stylex";
+import { rounded } from "@/styles/rounded.stylex";
+import { maxWidths, sizes } from "@/styles/sizes.stylex";
 
 function getDefaultValuesForPage(page: SourceSetEditWizardPage) {
     const defaultValues: Record<string, any> = {};
@@ -175,8 +180,13 @@ export function EditCharacterPage({
             }
 
             sections.push(
-                <div key={section.id} className="flex flex-col gap-2">
-                    <h2 className="text-xl font-semibold">{section.name}</h2>
+                <div
+                    key={section.id}
+                    {...stylex.props(styles.sectionContainer)}
+                >
+                    <h2 {...stylex.props(styles.sectionHeading)}>
+                        {section.name}
+                    </h2>
 
                     {fields}
                 </div>,
@@ -195,25 +205,27 @@ export function EditCharacterPage({
     }, [justSubmitted]);
 
     return (
-        <div className="flex flex-grow justify-center rounded-lg bg-gray-200 p-4 dark:bg-gray-800">
+        <div {...stylex.props(styles.container)}>
             <Form
                 form={form}
                 submitHandler={onSubmit}
-                className="flex flex-grow flex-col sm:max-w-md"
+                {...stylex.props(styles.form)}
             >
-                {renderSections()}
+                <div {...stylex.props(styles.formSectionsContainer)}>
+                    {renderSections()}
+                </div>
 
-                <div className="flex-grow" />
+                <div {...stylex.props(styles.formButtonsContainer)}>
+                    {justSubmitted && (
+                        <p {...stylex.props(styles.formSavedMessage)}>Saved!</p>
+                    )}
 
-                <div className="flex items-center justify-end gap-2">
-                    {justSubmitted && <p className="text-green-500">Saved!</p>}
-                    <Form.Button color="primary" size="md" className="w-fit">
+                    <Form.Button color="primary" size="md">
                         Save
                     </Form.Button>
                     <Form.Button
                         color="secondary"
                         size="md"
-                        className="w-fit"
                         disabled={!hasNext}
                         onAfterSubmit={onRequestNextPage}
                     >
@@ -224,3 +236,55 @@ export function EditCharacterPage({
         </div>
     );
 }
+
+const DARK = "@media (prefers-color-scheme: dark)";
+const SM_BREAKPOINT = "@media (min-width: 640px)";
+const styles = stylex.create({
+    container: {
+        display: "flex",
+        flexGrow: 1,
+        justifyContent: "center",
+        padding: sizes.spacing4,
+        borderRadius: rounded.lg,
+        backgroundColor: {
+            default: colours.gray200,
+            [DARK]: colours.gray800,
+        },
+    },
+
+    form: {
+        display: "flex",
+        flexDirection: "column",
+        flexGrow: 1,
+        justifyContent: "space-between",
+        maxWidth: {
+            default: "none",
+            [SM_BREAKPOINT]: maxWidths.md,
+        },
+    },
+    formSectionsContainer: {
+        display: "flex",
+        flexDirection: "column",
+        gap: sizes.spacing4,
+    },
+    formButtonsContainer: {
+        display: "flex",
+        gap: sizes.spacing2,
+        alignItems: "center",
+        justifyContent: "flex-end",
+    },
+    formSavedMessage: {
+        color: colours.green500,
+    },
+
+    sectionContainer: {
+        display: "flex",
+        flexDirection: "column",
+        gap: sizes.spacing2,
+    },
+    sectionHeading: {
+        fontSize: fontSizes.xl,
+        lineHeight: lineHeights.xl,
+        fontWeight: fontWeights.bold,
+    },
+});

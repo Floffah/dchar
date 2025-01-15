@@ -1,6 +1,6 @@
 "use client";
 
-import clsx from "clsx";
+import stylex, { StyleXStyles } from "@stylexjs/stylex";
 import {
     ComponentProps,
     PropsWithChildren,
@@ -10,6 +10,10 @@ import {
 } from "react";
 
 import { FormContext } from "@/components/Form/index";
+import { composeStyles } from "@/lib/utils/composeStyles";
+import { colours } from "@/styles/colours.stylex";
+import { fontSizes, fontWeights, lineHeights } from "@/styles/fonts.stylex";
+import { sizes } from "@/styles/sizes.stylex";
 
 export interface FormFieldBaseProps {
     name: string;
@@ -19,7 +23,7 @@ export interface FormFieldBaseProps {
     disabled?: boolean;
     orientation?: "horizontal" | "vertical";
     position?: "start" | "end";
-    fieldClassName?: string;
+    style?: StyleXStyles;
 }
 
 export const useFormField = <Props extends FormFieldBaseProps>(
@@ -40,7 +44,6 @@ export const useFormField = <Props extends FormFieldBaseProps>(
         warning,
         orientation = opts.defaultOrientation,
         position = opts.defaultPosition,
-        fieldClassName,
         disabled: propsDisabled,
         ...rest
     } = props;
@@ -59,7 +62,6 @@ export const useFormField = <Props extends FormFieldBaseProps>(
             warning,
             orientation,
             position,
-            fieldClassName,
             disabled,
         },
         controlProps: {
@@ -72,7 +74,7 @@ export const useFormField = <Props extends FormFieldBaseProps>(
 };
 
 export type FormFieldProps = Omit<
-    ComponentProps<"div"> & FormFieldBaseProps,
+    Omit<ComponentProps<"div">, "style"> & FormFieldBaseProps,
     "ref" | "children"
 >;
 
@@ -83,8 +85,8 @@ export function FormField({
     warning,
     orientation = "vertical",
     position = "start",
+    style: _, // TODO: add back when no longer causes a build error
     className,
-    fieldClassName,
     children,
     ...props
 }: PropsWithChildren<FormFieldProps>) {
@@ -107,11 +109,9 @@ export function FormField({
         return (
             label && (
                 <label
-                    className={clsx(
-                        "text-sm font-semibold text-gray-600 dark:text-white/80",
-                        {
-                            "!text-red-500": errorMessage,
-                        },
+                    {...stylex.props(
+                        styles.label,
+                        !!errorMessage && styles.labelError,
                     )}
                 >
                     {label}
@@ -124,10 +124,10 @@ export function FormField({
         return (
             description && (
                 <p
-                    className={clsx("text-sm font-light", {
-                        "text-red-500 dark:text-red-500/30": errorMessage,
-                        "text-gray-500 dark:text-white/70": !errorMessage,
-                    })}
+                    {...stylex.props(
+                        styles.description,
+                        !!errorMessage && styles.descriptionError,
+                    )}
                 >
                     {description}
                 </p>
@@ -138,23 +138,21 @@ export function FormField({
     const renderWarning = () => {
         return (
             warning &&
-            !errorMessage && (
-                <p className="text-sm text-yellow-500">{warning}</p>
-            )
+            !errorMessage && <p {...stylex.props(styles.warning)}>{warning}</p>
         );
     };
 
     const renderErrorMessage = () => {
         return (
             errorMessage && (
-                <p className="text-sm text-red-500">{errorMessage}</p>
+                <p {...stylex.props(styles.error)}>{errorMessage}</p>
             )
         );
     };
 
     return (
         <div
-            className={clsx(className, fieldClassName, "flex flex-col gap-0.5")}
+            {...composeStyles(stylex.props(styles.container), className)}
             {...props}
         >
             {orientation === "vertical" && (
@@ -170,20 +168,27 @@ export function FormField({
             )}
 
             {orientation === "horizontal" && (
-                <div className="flex flex-col space-y-1">
-                    <div className="flex items-center space-x-2">
-                        {position === "start" && children}
+                <div {...stylex.props(styles.horizontalContainer)}>
+                    <div
+                        {...stylex.props(
+                            styles.horizontalFieldWrapper,
+                            position === "end" &&
+                                styles.horizontalFieldWrapperEndPosition,
+                        )}
+                    >
+                        {children}
 
                         <div
-                            className={clsx("flex flex-col", {
-                                "flex-1": position === "end",
-                            })}
+                            data-position={position}
+                            {...stylex.props(
+                                styles.horizontalInfoContainer,
+                                position === "end" &&
+                                    styles.horizontalInfoContainerEndPosition,
+                            )}
                         >
                             {renderLabel()}
                             {renderDescription()}
                         </div>
-
-                        {position === "end" && children}
                     </div>
 
                     {renderWarning()}
@@ -193,3 +198,79 @@ export function FormField({
         </div>
     );
 }
+
+const DARK = "@media (prefers-color-scheme: dark)";
+const styles = stylex.create({
+    container: {
+        display: "flex",
+        flexDirection: "column",
+        gap: sizes.spacing1,
+    },
+
+    horizontalContainer: {
+        display: "flex",
+        flexDirection: "column",
+        gap: sizes.spacing1,
+    },
+
+    horizontalFieldWrapper: {
+        display: "flex",
+        alignItems: "center",
+        gap: sizes.spacing2,
+    },
+
+    horizontalFieldWrapperEndPosition: {
+        flexDirection: "row-reverse",
+    },
+
+    horizontalInfoContainer: {
+        display: "flex",
+        flexDirection: "column",
+    },
+
+    horizontalInfoContainerEndPosition: {
+        flex: "1 1 auto",
+    },
+
+    label: {
+        fontSize: fontSizes.sm,
+        lineHeight: lineHeights.sm,
+        color: {
+            default: colours.gray700,
+            [DARK]: "rgb(from white r g b / 80%)",
+        },
+    },
+
+    labelError: {
+        color: colours.red500,
+    },
+
+    description: {
+        fontSize: fontSizes.sm,
+        lineHeight: lineHeights.sm,
+        fontWeight: fontWeights.light,
+        color: {
+            default: colours.gray500,
+            [DARK]: "rgb(from white r g b / 70%)",
+        },
+    },
+
+    descriptionError: {
+        color: {
+            default: colours.red500,
+            [DARK]: `rgb(from ${colours.red500} r g b / 30%)`,
+        },
+    },
+
+    warning: {
+        fontSize: fontSizes.sm,
+        lineHeight: lineHeights.sm,
+        color: colours.yellow500,
+    },
+
+    error: {
+        fontSize: fontSizes.sm,
+        lineHeight: lineHeights.sm,
+        color: colours.red500,
+    },
+});

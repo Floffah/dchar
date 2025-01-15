@@ -1,7 +1,7 @@
 "use client";
 
 import * as RUISelect from "@radix-ui/react-select";
-import clsx from "clsx";
+import stylex, { StyleXStyles } from "@stylexjs/stylex";
 import {
     PropsWithChildren,
     forwardRef,
@@ -13,31 +13,35 @@ import {
 import ArrowDownIcon from "~icons/ic/baseline-keyboard-arrow-down";
 
 import { Icon } from "@/components/Icon";
+import { composeStyles } from "@/lib/utils/composeStyles";
+import { fontSizes, fontWeights, lineHeights } from "@/styles/fonts.stylex";
+import { rounded } from "@/styles/rounded.stylex";
+import { sizes } from "@/styles/sizes.stylex";
+import { theme } from "@/styles/theme.stylex";
 
 // TODO: make these components look nicer
 
 export const SelectButton = forwardRef<
     HTMLButtonElement,
-    RUISelect.SelectTriggerProps
->(({ className, children, ...props }, ref) => {
+    Omit<RUISelect.SelectTriggerProps, "style" | "ref"> & {
+        style?: StyleXStyles;
+    }
+>(({ className, style, children, ...props }, ref) => {
     return (
         <RUISelect.Trigger
             {...props}
-            className={clsx(
-                className,
-                "flex items-center gap-1 rounded-lg border border-gray-300 bg-gray-200 px-2 py-1 outline-none ring-0 ring-offset-0 transition-colors duration-150 data-[state=open]:border-blue-600 data-[state=open]:ring-1 data-[state=open]:ring-blue-600 dark:border-gray-700 dark:bg-gray-800",
-            )}
+            {...composeStyles(stylex.props(styles.button, style), className)}
             ref={ref}
         >
-            <p className="w-full flex-1 text-left">
+            <p {...stylex.props(styles.buttonText)}>
                 <RUISelect.Value placeholder={children} />
             </p>
 
-            <RUISelect.Icon>
+            <RUISelect.Icon asChild>
                 <Icon
                     label="select dropdown"
                     icon={ArrowDownIcon}
-                    className="h-5 w-5"
+                    {...stylex.props(styles.buttonIcon)}
                 />
             </RUISelect.Icon>
         </RUISelect.Trigger>
@@ -49,23 +53,25 @@ export const SelectContent = forwardRef<
     PropsWithChildren<
         Omit<
             RUISelect.SelectContentProps,
-            "children" | "ref" | "position" | "sideOffset"
-        >
+            "children" | "ref" | "position" | "sideOffset" | "style"
+        > & { style?: StyleXStyles }
     >
->(({ children, className, ...props }, ref) => {
+>(({ children, className, style, ...props }, ref) => {
     return (
         <RUISelect.Portal>
             <RUISelect.Content
                 ref={ref}
-                className={clsx(
-                    className,
-                    "p-0.75 w-[var(--radix-select-trigger-width)] overflow-hidden rounded-lg border border-gray-300 bg-gray-200 dark:border-gray-700 dark:bg-gray-800",
-                )}
                 position="popper"
                 sideOffset={5}
                 {...props}
+                {...composeStyles(
+                    stylex.props(styles.contentContainer, style),
+                    className,
+                )}
             >
-                <RUISelect.Viewport className="gap-0.75 flex flex-col">
+                <RUISelect.Viewport
+                    {...stylex.props(styles.contentViewportContainer)}
+                >
                     {children}
                 </RUISelect.Viewport>
             </RUISelect.Content>
@@ -77,22 +83,20 @@ export type SelectItemProps = RUISelect.SelectItemProps;
 
 export const SelectItem = forwardRef<
     HTMLDivElement,
-    PropsWithChildren<SelectItemProps>
->(({ children, value, disabled, className, ..._props }, ref) => {
+    PropsWithChildren<Omit<SelectItemProps, "style"> & { style?: StyleXStyles }>
+>(({ children, value, disabled, className, style, ..._props }, ref) => {
     return (
         <RUISelect.Item
             value={value}
             ref={ref}
             disabled={disabled}
-            className={clsx(
+            {...composeStyles(
+                stylex.props(
+                    styles.item,
+                    disabled && styles.itemDisabled,
+                    style,
+                ),
                 className,
-                "w-full rounded-md px-2 py-0.5 font-light outline-0 ring-0 transition-colors duration-150",
-                "",
-                {
-                    "cursor-pointer hover:bg-black/10 dark:hover:bg-white/10":
-                        !disabled,
-                    "select-none opacity-50": disabled,
-                },
             )}
         >
             <RUISelect.ItemText>{children}</RUISelect.ItemText>
@@ -164,3 +168,68 @@ export const Select = Object.assign(
         Item: SelectItem,
     },
 );
+
+const DARK = "@media (prefers-color-scheme: dark)";
+const styles = stylex.create({
+    button: {
+        display: "flex",
+        alignItems: "center",
+        gap: sizes.spacing1,
+        borderRadius: rounded.lg,
+        border: {
+            default: theme.controlBorder,
+            ":focus": theme.controlFocusedBorder,
+            ":is([data-state=open])": theme.controlFocusedBorder,
+        },
+        outline: "none",
+        background: theme.controlBackground,
+        padding: `${sizes.spacing1} ${sizes.spacing2}`,
+        fontSize: fontSizes.base,
+        lineHeight: lineHeights.base,
+    },
+    buttonText: {
+        width: "100%",
+        flex: 1,
+        textAlign: "left",
+    },
+    buttonIcon: {
+        height: sizes.spacing5,
+        width: sizes.spacing5,
+    },
+
+    contentContainer: {
+        padding: "0.1875rem",
+        width: "var(--radix-select-trigger-width)",
+        overflow: "hidden",
+        borderRadius: rounded.lg,
+        border: theme.controlBorder,
+        background: theme.controlBackground,
+    },
+    contentViewportContainer: {
+        display: "flex",
+        flexDirection: "column",
+        gap: "0.1875rem",
+    },
+
+    item: {
+        width: "100%",
+        borderRadius: rounded.md,
+        padding: `${sizes.spacing0_5} ${sizes.spacing2}`,
+        fontWeight: fontWeights.light,
+        outline: "none",
+        transitionProperty: "background-color",
+        transitionDuration: "150ms",
+        cursor: "pointer",
+        background: {
+            default: "none",
+            ":hover": {
+                default: "rgb(from black r g b / 10%)",
+                [DARK]: "rgb(from white r g b / 10%)",
+            },
+        },
+    },
+    itemDisabled: {
+        opacity: 0.5,
+        userSelect: "none",
+    },
+});

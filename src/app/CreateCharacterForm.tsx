@@ -1,7 +1,7 @@
 "use client";
 
 import { yupResolver } from "@hookform/resolvers/yup";
-import clsx from "clsx";
+import stylex from "@stylexjs/stylex";
 import { useRouter } from "next/navigation";
 import { useForm } from "react-hook-form";
 import { InferType, object, string } from "yup";
@@ -12,6 +12,11 @@ import { FormField } from "@/components/Form/FormField";
 import { saveSourceSet, serializeSourceSet } from "@/lib/Source/persistence";
 import { CharacterSheetVariableConstants } from "@/lib/constants";
 import { useSources } from "@/providers/SourcesProvider";
+import { colours } from "@/styles/colours.stylex";
+import { fontSizes, fontWeights } from "@/styles/fonts.stylex";
+import { rounded } from "@/styles/rounded.stylex";
+import { sizes } from "@/styles/sizes.stylex";
+import { theme } from "@/styles/theme.stylex";
 
 const formSchema = object({
     name: string().required(),
@@ -67,9 +72,9 @@ export function CreateCharacterForm() {
         <Form
             form={form}
             submitHandler={onSubmit}
-            className="flex flex-col gap-2"
+            {...stylex.props(styles.form)}
         >
-            <h1 className="text-xl font-bold">Create a new character</h1>
+            <h1 {...stylex.props(styles.heading)}>Create a new character</h1>
 
             <Form.Input
                 name="name"
@@ -85,19 +90,22 @@ export function CreateCharacterForm() {
                         <button
                             key={source.id}
                             type="button"
-                            className={clsx(
-                                "flex flex-col rounded-md p-2 text-left transition-colors duration-150",
-                                {
-                                    "outline outline-2 outline-blue-400 dark:outline-blue-600":
-                                        selectedSource === source.id,
-                                    "hover:bg-gray-300 hover:dark:bg-gray-700":
-                                        selectedSource !== source.id,
-                                },
+                            {...stylex.props(
+                                styles.sourceButton,
+                                selectedSource === source.id
+                                    ? styles.sourceButtonSelected
+                                    : styles.sourceButtonNotSelected,
                             )}
                             onClick={() => form.setValue("source", source.id)}
                         >
-                            <span className="font-semibold">{source.name}</span>
-                            <span className="text-sm">
+                            <span {...stylex.props(styles.sourceButtonName)}>
+                                {source.name}
+                            </span>
+                            <span
+                                {...stylex.props(
+                                    styles.sourceButtonDescription,
+                                )}
+                            >
                                 {source.description}
                             </span>
                         </button>
@@ -110,3 +118,48 @@ export function CreateCharacterForm() {
         </Form>
     );
 }
+
+const DARK = "@media (prefers-color-scheme: dark)";
+const styles = stylex.create({
+    form: {
+        display: "flex",
+        flexDirection: "column",
+        gap: sizes.spacing2,
+    },
+    heading: {
+        fontSize: fontSizes.xl,
+        lineHeight: fontSizes.xl,
+        fontWeight: fontWeights.bold,
+    },
+
+    sourceButton: {
+        display: "flex",
+        flexDirection: "column",
+        padding: sizes.spacing2,
+        borderRadius: rounded.md,
+        gap: sizes.spacing1,
+        textAlign: "left",
+        transitionProperty: "background-color, border-color, color",
+        transitionDuration: "150ms",
+        background: "none",
+        border: "none",
+    },
+    sourceButtonNotSelected: {
+        backgroundColor: {
+            ":hover": colours.gray300,
+            [DARK]: {
+                ":hover": colours.gray700,
+            },
+        },
+    },
+    sourceButtonSelected: {
+        outline: theme.controlFocusedBorder,
+    },
+    sourceButtonName: {
+        fontWeight: fontWeights.semibold,
+    },
+    sourceButtonDescription: {
+        fontSize: fontSizes.sm,
+        lineHeight: fontSizes.sm,
+    },
+});

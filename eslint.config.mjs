@@ -17,18 +17,39 @@ const eslintConfig = [
     ),
     {
         rules: {
-            "@typescript-eslint/no-explicit-any": "warn",
             "no-unused-vars": "off",
-            "@typescript-eslint/no-unused-vars": [
-                "error", // or "error"
+            "comma-dangle": ["error", "always-multiline"],
+            "no-empty": [
+                "error",
                 {
-                    argsIgnorePattern: "^_",
-                    varsIgnorePattern: "^_",
-                    caughtErrorsIgnorePattern: "^_",
+                    allowEmptyCatch: true,
                 },
             ],
-            "react/display-name": "off",
+            "@typescript-eslint/explicit-module-boundary-types": "off",
+            "@typescript-eslint/no-explicit-any": "off",
+            "@typescript-eslint/no-unused-vars": [
+                "error",
+                {
+                    args: "after-used",
+                    argsIgnorePattern: "^_",
+                    caughtErrors: "all",
+                    caughtErrorsIgnorePattern: "^_",
+                    destructuredArrayIgnorePattern: "^_",
+                    vars: "all",
+                    varsIgnorePattern: "^_",
+                    ignoreRestSiblings: false,
+                },
+            ],
+            "@typescript-eslint/no-var-requires": "warn",
         },
+        overrides: [
+            {
+                files: ["*.js"],
+                rules: {
+                    "@typescript-eslint/no-require-imports": "warn",
+                },
+            },
+        ],
     },
 ];
 
