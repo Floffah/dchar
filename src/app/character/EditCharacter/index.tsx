@@ -1,11 +1,13 @@
 "use client";
 
+import stylex from "@stylexjs/stylex";
 import { useState } from "react";
 
 import { EditCharacterPage } from "@/app/character/EditCharacter/EditCharacterPage";
 import { Button } from "@/components/Button";
 import { Select } from "@/components/Select";
 import { useSources } from "@/providers/SourcesProvider";
+import { sizes } from "@/styles/sizes.stylex";
 
 export function EditCharacter() {
     const sources = useSources();
@@ -24,8 +26,8 @@ export function EditCharacter() {
     }
 
     return (
-        <div className="flex flex-grow flex-col gap-2">
-            <div className="flex gap-2">
+        <div {...stylex.props(styles.container)}>
+            <div {...stylex.props(styles.pageControlsContainer)}>
                 <Button size="md" color="primary" disabled={!hasPrevious}>
                     Previous
                 </Button>
@@ -64,3 +66,17 @@ export function EditCharacter() {
         </div>
     );
 }
+
+const styles = stylex.create({
+    container: {
+        display: "flex",
+        flexDirection: "column",
+        flexGrow: 1,
+        gap: sizes.spacing2,
+    },
+
+    pageControlsContainer: {
+        display: "flex",
+        gap: sizes.spacing2,
+    },
+});

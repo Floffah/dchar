@@ -29,7 +29,9 @@ export function SourcesProvider({ children }: PropsWithChildren) {
     const loadSourceSetMutation = useMutation({
         mutationKey: ["loadSourceSet"],
         mutationFn: async (data: SavableSourceSet) => {
-            return await sourceSet.load(data);
+            await sourceSet.load(data);
+
+            return true;
         },
     });
 
@@ -85,7 +87,13 @@ export function SourcesProvider({ children }: PropsWithChildren) {
 
     return (
         <SourceContext.Provider
-            value={{ sourceSet, isLoading: loadSourceSetMutation.isPending }}
+            value={{
+                sourceSet,
+                isLoading:
+                    loadSourceSetMutation.isPending ||
+                    (!loadSourceSetMutation.data &&
+                        loadSourceSetMutation.failureCount === 0),
+            }}
         >
             {children}
         </SourceContext.Provider>
