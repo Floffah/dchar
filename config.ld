@@ -1,8 +1,0 @@
-project = "DChar"
-title = "DChar Documentation"
-description = "Lua API for DChar"
-format = "lunamark"
-readme = "README.md"
-file = "stdlib"
-dir = "docs"
-style = "!new"

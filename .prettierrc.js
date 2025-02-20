@@ -9,6 +9,9 @@ module.exports = {
     endOfLine: "lf",
     embeddedLanguageFormatting: "auto",
 
+    tailwindConfig: "./tailwind.config.ts",
+    tailwindFunctions: ["clsx"],
+
     importOrder: ["<THIRD_PARTY_MODULES>", "^~icons/(.*)$", "@/(.*)$"],
     importOrderSeparation: true,
     importOrderSortSpecifiers: true,
@@ -16,6 +19,6 @@ module.exports = {
 
     plugins: [
         "@trivago/prettier-plugin-sort-imports",
-        "prettier-plugin-stylex-key-sort",
+        "prettier-plugin-tailwindcss",
     ],
 };
