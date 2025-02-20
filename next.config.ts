@@ -13,6 +13,8 @@ const nextConfig: NextConfig = {
     serverExternalPackages: ["@node-rs/bcrypt"],
     experimental: {
         ppr: true,
+        reactCompiler: true,
+        dynamicIO: true,
     },
     typescript: {
         // part of lint step, next ignores tsconfig references and breaks trpc

@@ -1,15 +1,19 @@
 "use client";
 
-import stylex from "@stylexjs/stylex";
-import { useState } from "react";
+import stylex, { StyleXStyles } from "@stylexjs/stylex";
+import { ComponentProps, forwardRef, useState } from "react";
 
 import { EditCharacterPage } from "@/app/character/EditCharacter/EditCharacterPage";
 import { Button } from "@/components/Button";
 import { Select } from "@/components/Select";
+import { composeStyles } from "@/lib/utils/composeStyles";
 import { useSources } from "@/providers/SourcesProvider";
 import { sizes } from "@/styles/sizes.stylex";
 
-export function EditCharacter() {
+export const EditCharacter = forwardRef<
+    HTMLDivElement,
+    Omit<ComponentProps<"div">, "style" | "ref"> & { style?: StyleXStyles }
+>(({ className, style, ...props }, ref) => {
     const sources = useSources();
 
     const pageKeys = Object.keys(sources.sourceSet.editWizard.pages);
@@ -26,7 +30,11 @@ export function EditCharacter() {
     }
 
     return (
-        <div {...stylex.props(styles.container)}>
+        <div
+            {...props}
+            {...composeStyles(stylex.props(styles.container, style), className)}
+            ref={ref}
+        >
             <div {...stylex.props(styles.pageControlsContainer)}>
                 <Button size="md" color="primary" disabled={!hasPrevious}>
                     Previous
@@ -65,13 +73,12 @@ export function EditCharacter() {
             )}
         </div>
     );
-}
+});
 
 const styles = stylex.create({
     container: {
         display: "flex",
         flexDirection: "column",
-        flexGrow: 1,
         gap: sizes.spacing2,
     },
 

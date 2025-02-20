@@ -81,7 +81,10 @@ export default function CharacterPage() {
 
             <Tabs.Content
                 value="view"
-                {...stylex.props(styles.viewTabContentBox)}
+                {...stylex.props(
+                    styles.baseTabContentBox,
+                    styles.viewTabContentBox,
+                )}
             >
                 <p>
                     Page content not implemented yet. Click the edit button to
@@ -91,7 +94,11 @@ export default function CharacterPage() {
 
             <Tabs.Content
                 value="edit"
-                {...stylex.props(styles.editTabContentBox)}
+                {...stylex.props(
+                    styles.baseTabContentBox,
+                    styles.editTabContentBox,
+                )}
+                asChild
             >
                 <EditCharacter />
             </Tabs.Content>
@@ -168,13 +175,16 @@ const styles = stylex.create({
         cursor: "pointer",
     },
 
+    baseTabContentBox: {
+        display: {
+            default: "none",
+            ":is([data-state=active])": "flex",
+        },
+    },
     viewTabContentBox: {
         margin: "auto auto",
     },
     editTabContentBox: {
-        display: "flex",
-        flexDirection: "column",
         flexGrow: 1,
-        gap: sizes.spacing2,
     },
 });

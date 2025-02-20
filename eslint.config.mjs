@@ -41,15 +41,8 @@ const eslintConfig = [
                 },
             ],
             "@typescript-eslint/no-var-requires": "warn",
+            "react/display-name": "off",
         },
-        overrides: [
-            {
-                files: ["*.js"],
-                rules: {
-                    "@typescript-eslint/no-require-imports": "warn",
-                },
-            },
-        ],
     },
 ];
 

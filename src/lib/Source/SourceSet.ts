@@ -1,5 +1,4 @@
 import EventEmitter from "events";
-import TypedEmitter from "typed-emitter/rxjs";
 
 import { SourceSetEditWizard } from "@/lib/Source/SourceSetEditWizard";
 import { Source } from "@/lib/Source/index";
@@ -11,17 +10,14 @@ export interface SavableSourceSet {
     variables: SourceSet["variables"];
 }
 
-type SourceSetEvents = {
-    sourcesChanged: () => void;
-    variableChanged: (name: string, oldValue: any, newValue: any) => void;
-    editWizardChanged: () => void;
-    loaded: () => void;
-};
+interface SourceSetEvents {
+    sourcesChanged: [];
+    variableChanged: [string, any, any];
+    editWizardChanged: [];
+    loaded: [];
+}
 
-const Emitter = EventEmitter as unknown as {
-    new (): TypedEmitter<SourceSetEvents>;
-};
-export class SourceSet extends Emitter {
+export class SourceSet extends EventEmitter<SourceSetEvents> {
     public sources: Source[] = [];
 
     public variables: Record<string, { name: string; value: any }> = {};
