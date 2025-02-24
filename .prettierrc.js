@@ -12,7 +12,7 @@ module.exports = {
     tailwindConfig: "./tailwind.config.ts",
     tailwindFunctions: ["clsx"],
 
-    importOrder: ["<THIRD_PARTY_MODULES>", "^~icons/(.*)$", "@/(.*)$"],
+    importOrder: ["<THIRD_PARTY_MODULES>", "@/(.*)$", "\\./(.*)$"],
     importOrderSeparation: true,
     importOrderSortSpecifiers: true,
     importOrderGroupNamespaceSpecifiers: true,

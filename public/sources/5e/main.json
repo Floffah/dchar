@@ -1,0 +1,9 @@
+{
+    "source": 1,
+    "name": "Fifth Edition",
+    "description": "Dungeons & Dragons Fifth Edition source material",
+    "extends": [
+        "base:main"
+    ],
+    "version": "sha256:6e42e39453b6c7d171aac1c5340d40913f71dfb08d9a96f64ddaf1592f59da0a"
+}

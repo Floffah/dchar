@@ -1,0 +1,55 @@
+{
+  "$ref": "#/definitions/JSONSource",
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "definitions": {
+    "JSONSource": {
+      "additionalProperties": false,
+      "properties": {
+        "description": {
+          "description": "The description of the source",
+          "type": "string"
+        },
+        "extends": {
+          "description": "A list of sources this should be merged with. Can be relative paths or web urls. In the future, GitHub repositories will be supported. Supported domains for web urls are:\n- `raw.githubusercontent.com`\n- `dchar.floffah.dev`",
+          "items": {
+            "$ref": "#/definitions/JSONSourceIdentifier"
+          },
+          "type": "array"
+        },
+        "lib": {
+          "description": "Set this to true if this shouldn't be loaded standalone, but should be depended on by other sources.",
+          "type": "boolean"
+        },
+        "name": {
+          "description": "The name of the source",
+          "type": "string"
+        },
+        "source": {
+          "const": 1,
+          "description": "Indicates that this file is a source, value should *always* be `1`",
+          "type": "number"
+        },
+        "version": {
+          "$ref": "#/definitions/JSONSourceVersion",
+          "description": "The version of the source. If not provided, a hash of the source will be used. SemVer/Epoch SemVer is recommended."
+        }
+      },
+      "required": [
+        "source",
+        "name",
+        "description"
+      ],
+      "type": "object"
+    },
+    "JSONSourceIdentifier": {
+      "type": [
+        "string"
+      ]
+    },
+    "JSONSourceVersion": {
+      "type": [
+        "string"
+      ]
+    }
+  }
+}

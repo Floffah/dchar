@@ -1,0 +1,7 @@
+{
+    "source": 1,
+    "name": "Base Source",
+    "description": "Base source material. All other sources should depend on this",
+    "lib": true,
+    "version": "sha256:05a257b4daddf5391faaebf0b835c77e9a4476dd76d459c4b6b197ed5c2a538d"
+}
