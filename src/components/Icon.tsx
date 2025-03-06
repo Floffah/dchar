@@ -15,8 +15,8 @@ export const Icon = ({ label, size, children }: IconProps) => {
         <Slot
             aria-hidden
             className={clsx({
-                "h-4 w-4": size === "sm",
-                "h-5 w-5": size === "md",
+                "h-3.5 w-3.5": size === "sm",
+                "h-4 w-4": size === "md",
             })}
         >
             {children}

@@ -5,6 +5,140 @@
     "JSONSource": {
       "additionalProperties": false,
       "properties": {
+        "definitions": {
+          "additionalProperties": false,
+          "description": "The definitions of the source. The actual content of the source resides here.",
+          "properties": {
+            "fields": {
+              "additionalProperties": {
+                "additionalProperties": false,
+                "properties": {
+                  "default": {
+                    "anyOf": [
+                      {
+                        "type": "string"
+                      },
+                      {
+                        "type": "number"
+                      },
+                      {
+                        "type": "boolean"
+                      },
+                      {
+                        "type": "object"
+                      },
+                      {
+                        "items": {},
+                        "type": "array"
+                      }
+                    ]
+                  },
+                  "description": {
+                    "type": "string"
+                  },
+                  "enum": {
+                    "items": {
+                      "type": "string"
+                    },
+                    "type": "array"
+                  },
+                  "fromVariable": {
+                    "type": "string"
+                  },
+                  "name": {
+                    "type": "string"
+                  },
+                  "required": {
+                    "type": "boolean"
+                  },
+                  "type": {
+                    "enum": [
+                      "string",
+                      "number",
+                      "boolean",
+                      "object",
+                      "array",
+                      "enum"
+                    ],
+                    "type": "string"
+                  },
+                  "updatesVariable": {
+                    "type": "string"
+                  }
+                },
+                "required": [
+                  "name",
+                  "description",
+                  "type"
+                ],
+                "type": "object"
+              },
+              "type": "object"
+            },
+            "pages": {
+              "additionalProperties": {
+                "additionalProperties": false,
+                "properties": {
+                  "name": {
+                    "type": "string"
+                  }
+                },
+                "required": [
+                  "name"
+                ],
+                "type": "object"
+              },
+              "description": "Pages that the source contributes to the editor wizard. You don't need to define all pages here, only the ones that are unique to this source or that you want to override. Key should be the string ID",
+              "type": "object"
+            },
+            "sections": {
+              "additionalProperties": {
+                "additionalProperties": false,
+                "properties": {
+                  "name": {
+                    "type": "string"
+                  },
+                  "page": {
+                    "description": "The ID of the page this section belongs to",
+                    "type": "string"
+                  }
+                },
+                "required": [
+                  "name",
+                  "page"
+                ],
+                "type": "object"
+              },
+              "description": "Page sections that the source contributes to the editor wizard. You don't need to define all sections here, only the ones that are unique to this source or that you want to override. Key should be the string ID.",
+              "type": "object"
+            },
+            "variables": {
+              "additionalProperties": {
+                "additionalProperties": false,
+                "properties": {
+                  "calculation": {
+                    "description": "A mathematical expression that calculates the value of this variable. Only used if virtual is set. Examples:\n- `1 + 1`\n- `base:main.variables.strength + 2`\n- `0.5 * (base:main.variables.strength + base:main.variables.dexterity + base:main.variables.constitution + base:main.variables.intelligence + base:main.variables.wisdom + base:main.variables.charisma)`",
+                    "type": "string"
+                  },
+                  "description": {
+                    "type": "string"
+                  },
+                  "virtual": {
+                    "description": "Whether this is a virtual variable and not set by a field in the character editor wizard. If set, you must also set calculation",
+                    "type": "boolean"
+                  }
+                },
+                "required": [
+                  "description"
+                ],
+                "type": "object"
+              },
+              "description": "A list of variables that this source may set or utilise. These are unique to the source and cannot be referenced by other sources with name alone. Other sources may reference them with `namespace:name.variable`",
+              "type": "object"
+            }
+          },
+          "type": "object"
+        },
         "description": {
           "description": "The description of the source",
           "type": "string"
@@ -15,6 +149,10 @@
             "$ref": "#/definitions/JSONSourceIdentifier"
           },
           "type": "array"
+        },
+        "id": {
+          "$ref": "#/definitions/JSONSourceIdentifier",
+          "description": "The id to use for the identifier in the editor. Should really be the same ID as what is used to resolve it, but it doesn't have to be. (e.g. should be a url if it's loaded via a raw.githubusercontent.com url)"
         },
         "lib": {
           "description": "Set this to true if this shouldn't be loaded standalone, but should be depended on by other sources.",
@@ -36,8 +174,10 @@
       },
       "required": [
         "source",
+        "id",
         "name",
-        "description"
+        "description",
+        "definitions"
       ],
       "type": "object"
     },

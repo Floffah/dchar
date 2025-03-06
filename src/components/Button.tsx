@@ -103,7 +103,7 @@ export const Button = forwardRef<HTMLButtonElement, ButtonProps>(
                     ref={ref as any}
                     className={clsx(
                         className,
-                        "flex h-fit items-center justify-center space-x-1 transition-[opacity,color,background-color] duration-150",
+                        "flex h-fit cursor-pointer items-center justify-center space-x-1 transition-[opacity,color,background-color] duration-150",
                         {
                             "pointer-events-none cursor-not-allowed opacity-60":
                                 disabled,
@@ -115,7 +115,7 @@ export const Button = forwardRef<HTMLButtonElement, ButtonProps>(
                                 color === "primary",
                             "bg-green-500 text-white dark:bg-green-700":
                                 color === "success",
-                            "bg-black/10 text-black dark:bg-white/10 dark:text-white":
+                            "bg-gray-200 text-black dark:bg-gray-700 dark:text-white":
                                 color === "secondary",
                             "bg-red-500 text-white dark:bg-red-800":
                                 color === "danger",

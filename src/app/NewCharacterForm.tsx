@@ -1,16 +1,16 @@
 "use client";
 
 import { yupResolver } from "@hookform/resolvers/yup";
-import { useMutation, useQuery } from "@tanstack/react-query";
+import { useMutation } from "@tanstack/react-query";
 import clsx from "clsx";
 import { useRouter } from "next/navigation";
 import { useForm } from "react-hook-form";
 import { InferType, object, string } from "yup";
 
-import { getAvailableSources } from "@/actions/getAvailableSources";
 import { Form } from "@/components/Form";
 import { FormField } from "@/components/Form/FormField";
 import { stringifySheet } from "@/lib/characterSheets/stringifySheet";
+import { useAvailableSources } from "@/lib/data/useAvailableSources";
 import { db } from "@/lib/localdb";
 import { getSourceWithDependencies } from "@/lib/sources/getSource";
 import { CharacterSheet } from "@/types/CharacterSheet";
@@ -27,10 +27,7 @@ export function NewCharacterForm() {
 
     const router = useRouter();
 
-    const availableSources = useQuery({
-        queryKey: ["availableSources"],
-        queryFn: () => getAvailableSources(),
-    });
+    const availableSources = useAvailableSources();
 
     const getSourcesMutation = useMutation({
         mutationKey: ["getSources"],
@@ -71,7 +68,9 @@ export function NewCharacterForm() {
 
     return (
         <div className="flex flex-col gap-4">
-            <h1 className="text-xl font-bold">New Character</h1>
+            <h1 className="text-xl font-bold dark:text-gray-200">
+                New Character
+            </h1>
 
             <Form
                 form={form}
@@ -111,7 +110,9 @@ export function NewCharacterForm() {
                                     }
                                     type="button"
                                 >
-                                    <p className="font-semibold">None</p>
+                                    <p className="font-semibold dark:text-gray-200">
+                                        None
+                                    </p>
                                     <p className="text-sm text-black/80 dark:text-white/80">
                                         Add sources later, I want to to do it
                                         myself
@@ -134,7 +135,7 @@ export function NewCharacterForm() {
                                         }
                                         type="button"
                                     >
-                                        <p className="font-semibold">
+                                        <p className="font-semibold dark:text-gray-200">
                                             {source.name}
                                         </p>
                                         <p className="text-sm text-black/80 dark:text-white/80">
