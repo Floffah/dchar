@@ -1,26 +1,23 @@
 "use client";
 
-import { yupResolver } from "@hookform/resolvers/yup";
 import { useMutation } from "@tanstack/react-query";
 import clsx from "clsx";
 import { useRouter } from "next/navigation";
-import { useForm } from "react-hook-form";
-import { InferType, object, string } from "yup";
+import { z } from "zod";
 
-import { Form } from "@/components/Form";
-import { FormField } from "@/components/Form/FormField";
 import { stringifySheet } from "@/lib/characterSheets/stringifySheet";
 import { useAvailableSources } from "@/lib/data/useAvailableSources";
+import { useAppForm } from "@/lib/hooks/useAppForm";
 import { db } from "@/lib/localdb";
 import { getSourceWithDependencies } from "@/lib/sources/getSource";
 import { CharacterSheet } from "@/types/CharacterSheet";
 import { JSONSourceIdentifier } from "@/types/JSONSource";
 
-const formSchema = object({
-    characterName: string().required("Character name is required"),
-    baseSource: string().required("Source is required"),
+const formSchema = z.object({
+    characterName: z.string().nonempty("Character name is required"),
+    baseSource: z.string(),
 });
-type FormValues = InferType<typeof formSchema>;
+type FormValues = z.infer<typeof formSchema>;
 
 export function NewCharacterForm() {
     "use no memo";
@@ -34,124 +31,134 @@ export function NewCharacterForm() {
         mutationFn: (id: string) => getSourceWithDependencies(id),
     });
 
-    const form = useForm({
-        resolver: yupResolver(formSchema),
+    const form = useAppForm({
+        validators: {
+            onSubmit: formSchema,
+        },
         defaultValues: {
             characterName: "",
             baseSource: "base",
+        } as FormValues,
+        onSubmit: async ({ value }) => {
+            router.prefetch("/character");
+
+            await getSourcesMutation.mutateAsync(value.baseSource);
+
+            const sheet: CharacterSheet = {
+                sources: [value.baseSource as JSONSourceIdentifier],
+                variables: {
+                    characterName: {
+                        value: value.characterName,
+                    },
+                },
+            };
+
+            db.characterSheets.put({
+                name: value.characterName,
+                content: sheet,
+            });
+
+            router.push(`/character?data=${stringifySheet(sheet)}`);
         },
     });
 
-    const selectedSource = form.watch("baseSource");
-
-    const onSubmit = async (values: FormValues) => {
-        router.prefetch("/character");
-
-        await getSourcesMutation.mutateAsync(values.baseSource);
-
-        const sheet: CharacterSheet = {
-            sources: [values.baseSource as JSONSourceIdentifier],
-            variables: {
-                characterName: {
-                    value: values.characterName,
-                },
-            },
-        };
-
-        db.characterSheets.put({
-            name: values.characterName,
-            content: sheet,
-        });
-
-        router.push(`/character?data=${stringifySheet(sheet)}`);
-    };
-
     return (
         <div className="flex flex-col gap-4">
-            <h1 className="text-xl font-bold dark:text-gray-200">
-                New Character
-            </h1>
+            <h1 className="text-xl font-bold text-gray-200">New Character</h1>
 
-            <Form
-                form={form}
-                submitHandler={onSubmit}
+            <form
                 className="flex flex-col gap-2"
+                onSubmit={(e) => {
+                    e.preventDefault();
+                    form.handleSubmit();
+                }}
             >
-                <Form.Input
-                    name="characterName"
-                    label="Character Name"
-                    description="You can always change this later."
-                    placeholder="Chris P. Bacon"
-                />
-
-                <FormField
-                    name="baseSource"
-                    label="Source"
-                    description="Choose a source to start with. Don't worry, you can load more later."
-                >
-                    <div className="flex max-h-40 flex-col gap-2 overflow-y-auto">
-                        {availableSources.isLoading && (
-                            <>
-                                <div className="h-16 w-full animate-pulse rounded bg-white/10"></div>
-                                <div className="h-16 w-full animate-pulse rounded bg-white/10"></div>
-                            </>
+                <form.AppForm>
+                    <form.AppField name="characterName">
+                        {(field) => (
+                            <field.Input
+                                label="Character Name"
+                                description="You can always change this later."
+                                placeholder="Chris P. Bacon"
+                            />
                         )}
+                    </form.AppField>
 
-                        {availableSources.data && (
-                            <>
-                                <button
-                                    className={clsx(
-                                        "flex cursor-pointer flex-col rounded border border-black/10 px-4 py-2 text-left transition-colors dark:border-white/10",
-                                        selectedSource === "base" &&
-                                            "bg-black/10 dark:bg-white/10",
+                    <form.AppField name="baseSource">
+                        {(field) => (
+                            <field.Field
+                                label="Source"
+                                description="Choose a source to start with. Don't worry, you can load more later."
+                            >
+                                <div className="flex max-h-40 flex-col gap-2 overflow-y-auto">
+                                    {availableSources.isLoading && (
+                                        <>
+                                            <div className="h-16 w-full animate-pulse rounded bg-white/10"></div>
+                                            <div className="h-16 w-full animate-pulse rounded bg-white/10"></div>
+                                        </>
                                     )}
-                                    onClick={() =>
-                                        form.setValue("baseSource", "base")
-                                    }
-                                    type="button"
-                                >
-                                    <p className="font-semibold dark:text-gray-200">
-                                        None
-                                    </p>
-                                    <p className="text-sm text-black/80 dark:text-white/80">
-                                        Add sources later, I want to to do it
-                                        myself
-                                    </p>
-                                </button>
 
-                                {availableSources.data.map((source) => (
-                                    <button
-                                        key={source.id}
-                                        className={clsx(
-                                            "flex cursor-pointer flex-col rounded border border-black/10 px-4 py-2 text-left transition-colors dark:border-white/10",
-                                            selectedSource === source.id &&
-                                                "bg-black/10 dark:bg-white/10",
-                                        )}
-                                        onClick={() =>
-                                            form.setValue(
-                                                "baseSource",
-                                                source.id,
-                                            )
-                                        }
-                                        type="button"
-                                    >
-                                        <p className="font-semibold dark:text-gray-200">
-                                            {source.name}
-                                        </p>
-                                        <p className="text-sm text-black/80 dark:text-white/80">
-                                            {source.description}
-                                        </p>
-                                    </button>
-                                ))}
-                            </>
+                                    {availableSources.data && (
+                                        <>
+                                            <button
+                                                className={clsx(
+                                                    "flex cursor-pointer flex-col rounded border border-white/10 px-4 py-2 text-left transition-colors",
+                                                    field.state.value ===
+                                                        "base" && "bg-white/10",
+                                                )}
+                                                onClick={() =>
+                                                    field.setValue("base")
+                                                }
+                                                type="button"
+                                            >
+                                                <p className="font-semibold text-gray-200">
+                                                    None
+                                                </p>
+                                                <p className="text-sm text-white/80">
+                                                    Add sources later, I want to
+                                                    to do it myself
+                                                </p>
+                                            </button>
+
+                                            {availableSources.data.map(
+                                                (source) => (
+                                                    <button
+                                                        key={source.id}
+                                                        className={clsx(
+                                                            "flex cursor-pointer flex-col rounded border border-white/10 px-4 py-2 text-left transition-colors",
+                                                            field.state
+                                                                .value ===
+                                                                source.id &&
+                                                                "bg-white/10",
+                                                        )}
+                                                        onClick={() =>
+                                                            field.setValue(
+                                                                source.id,
+                                                            )
+                                                        }
+                                                        type="button"
+                                                    >
+                                                        <p className="font-semibold text-gray-200">
+                                                            {source.name}
+                                                        </p>
+                                                        <p className="text-sm text-white/80">
+                                                            {source.description}
+                                                        </p>
+                                                    </button>
+                                                ),
+                                            )}
+                                        </>
+                                    )}
+                                </div>
+                            </field.Field>
                         )}
-                    </div>
-                </FormField>
+                    </form.AppField>
 
-                <Form.Button size="md" color="primary">
-                    Create Character
-                </Form.Button>
-            </Form>
+                    <form.SubscribeButton size="md" color="primary">
+                        Create Character
+                    </form.SubscribeButton>
+                </form.AppForm>
+            </form>
         </div>
     );
 }

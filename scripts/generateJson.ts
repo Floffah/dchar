@@ -5,7 +5,7 @@ import { resolve } from "path";
 import { hashSource } from "@/lib/hashSource";
 import { builtinSources } from "@/lib/sources";
 
-await $`ts-json-schema-generator --path src/types/**/*.ts --type JSONSource --out public/schemas/json-source.json --tsconfig tsconfig.json`;
+await $`ts-json-schema-generator --path src/types/\*\*/\*.ts --type JSONSource --out public/schemas/json-source.json --tsconfig tsconfig.json`;
 
 const sourcesDir = resolve(process.cwd(), "public/sources");
 

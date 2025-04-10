@@ -15,7 +15,7 @@ export const TextArea = forwardRef<HTMLTextAreaElement, TextAreaProps>(
                 disabled={disabled}
                 className={clsx(
                     className,
-                    "rounded-lg border border-gray-400 bg-transparent px-2 py-1 placeholder-black/40 ring-0 transition-colors duration-150 outline-none focus:ring-1 focus:ring-offset-0 dark:border-gray-700 dark:placeholder-white/40",
+                    "rounded-lg border border-gray-700 bg-transparent px-2 py-1 placeholder-white/40 ring-0 transition-colors duration-150 outline-none focus:ring-1 focus:ring-offset-0",
                     {
                         "focus:border-blue-600 focus:ring-blue-600":
                             !error && !disabled,
@@ -27,7 +27,7 @@ export const TextArea = forwardRef<HTMLTextAreaElement, TextAreaProps>(
                             disabled,
                     },
                 )}
-            ></TextareaAutosize>
+            />
         );
     },
 );

@@ -28,7 +28,7 @@ export default function RootLayout({ children }: PropsWithChildren) {
             lang="en"
             className={clsx(geistSans.variable, geistMono.variable)}
         >
-            <body className="antialiased dark:bg-gray-950">
+            <body className="bg-gray-950 antialiased">
                 <QueryClientProvider>{children}</QueryClientProvider>
             </body>
         </html>

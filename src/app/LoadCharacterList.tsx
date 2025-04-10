@@ -18,7 +18,7 @@ export function LoadCharacterList() {
 
     return (
         <div className="flex flex-col gap-4">
-            <h1 className="text-xl font-bold dark:text-gray-200">
+            <h1 className="text-xl font-bold text-gray-200">
                 Load a Character
             </h1>
 
@@ -35,7 +35,7 @@ export function LoadCharacterList() {
                         <Link
                             key={character.name}
                             href={`/character?data=${stringifySheet(character.content)}`}
-                            className="flex cursor-pointer items-center gap-2 rounded border border-black/10 px-4 py-2 text-left dark:border-white/10 dark:text-white"
+                            className="flex cursor-pointer items-center gap-2 rounded border border-white/10 px-4 py-2 text-left text-white"
                         >
                             <Icon label="character" size="sm">
                                 <UserIcon />
@@ -47,7 +47,7 @@ export function LoadCharacterList() {
                 {!allCharacters.isLoading &&
                     !allCharacters.isError &&
                     !allCharacters.data?.length && (
-                        <p className="m-auto flex items-center gap-2 text-sm text-black/60 dark:text-white/60">
+                        <p className="m-auto flex items-center gap-2 text-sm text-white/60">
                             <Icon size="sm">
                                 <UserXIcon />
                             </Icon>

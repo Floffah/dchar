@@ -2,7 +2,7 @@
 
 import { Slot } from "@radix-ui/react-slot";
 import clsx from "clsx";
-import { useRouter } from "next/navigation";
+import { usePathname, useRouter } from "next/navigation";
 import {
     ComponentProps,
     ReactElement,
@@ -41,6 +41,7 @@ export const Button = forwardRef<HTMLButtonElement, ButtonProps>(
             link,
             icon,
             iconLabel,
+            disabled: propsDisabled,
             loading: propsLoading,
             children: propsChildren,
             onClick,
@@ -55,7 +56,9 @@ export const Button = forwardRef<HTMLButtonElement, ButtonProps>(
 
         const Component =
             asChild && typeof propsChildren !== "string" ? Slot : "button";
-        const disabled = loading || props.disabled;
+        const disabled = loading || propsDisabled;
+
+        const currentPathname = usePathname();
 
         useEffect(() => {
             setLoading(!!propsLoading);
@@ -66,6 +69,12 @@ export const Button = forwardRef<HTMLButtonElement, ButtonProps>(
                 router.prefetch(link);
             }
         }, [link, router]);
+
+        useEffect(() => {
+            if (loading && link && currentPathname === link) {
+                setLoading(false);
+            }
+        }, [currentPathname, loading, link]);
 
         const children = (
             <>
@@ -111,14 +120,10 @@ export const Button = forwardRef<HTMLButtonElement, ButtonProps>(
                             "rounded-lg px-2 py-1 text-sm": size === "sm",
                             "rounded-lg px-3 py-1.5": size === "md",
 
-                            "bg-blue-500 text-white dark:bg-blue-700":
-                                color === "primary",
-                            "bg-green-500 text-white dark:bg-green-700":
-                                color === "success",
-                            "bg-gray-200 text-black dark:bg-gray-700 dark:text-white":
-                                color === "secondary",
-                            "bg-red-500 text-white dark:bg-red-800":
-                                color === "danger",
+                            "bg-blue-700 text-white": color === "primary",
+                            "bg-green-700 text-white": color === "success",
+                            "bg-gray-700 text-white": color === "secondary",
+                            "bg-red-800 text-white": color === "danger",
                         },
                     )}
                     onClick={async (e) => {

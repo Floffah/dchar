@@ -1,3 +1,5 @@
+"use client";
+
 import clsx from "clsx";
 import { BookPlusIcon, EyeIcon, HomeIcon, PencilIcon } from "lucide-react";
 import Link from "next/link";
@@ -14,13 +16,13 @@ export function CharacterSheetNavBar() {
     const { currentAction, setCurrentAction } = useCharacterEditorStore();
 
     return (
-        <div className="flex justify-between gap-4 rounded-lg border border-gray-200 bg-gray-100 p-2 dark:border-gray-700 dark:bg-gray-800">
+        <div className="flex justify-between gap-4 rounded-lg border border-gray-700 bg-gray-800 p-2">
             <div className="flex items-center gap-2">
                 <Button size="sm" color="secondary" icon={<HomeIcon />} asChild>
                     <Link href="/">Home</Link>
                 </Button>
 
-                <p className="font-semibold dark:text-white">{characterName}</p>
+                <p className="font-semibold text-white">{characterName}</p>
             </div>
 
             <div className="flex items-center">
@@ -29,7 +31,7 @@ export function CharacterSheetNavBar() {
                     color="secondary"
                     icon={<PencilIcon />}
                     className={clsx("rounded-r-none", {
-                        "bg-gray-300 dark:bg-gray-600!":
+                        "bg-gray-600!":
                             currentAction === CharacterEditorAction.VIEW,
                     })}
                     onClick={() => setCurrentAction(CharacterEditorAction.VIEW)}
@@ -41,7 +43,7 @@ export function CharacterSheetNavBar() {
                     color="secondary"
                     icon={<EyeIcon />}
                     className={clsx("rounded-none", {
-                        "bg-gray-300 dark:bg-gray-600!":
+                        "bg-gray-600!":
                             currentAction === CharacterEditorAction.EDIT,
                     })}
                     onClick={() => setCurrentAction(CharacterEditorAction.EDIT)}
@@ -53,7 +55,7 @@ export function CharacterSheetNavBar() {
                     color="secondary"
                     icon={<BookPlusIcon />}
                     className={clsx("rounded-l-none", {
-                        "bg-gray-300 dark:bg-gray-600!":
+                        "bg-gray-600!":
                             currentAction ===
                             CharacterEditorAction.EDIT_SOURCES,
                     })}

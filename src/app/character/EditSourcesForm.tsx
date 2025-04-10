@@ -1,13 +1,12 @@
-import { yupResolver } from "@hookform/resolvers/yup";
-import clsx from "clsx";
-import { motion } from "motion/react";
-import { useForm } from "react-hook-form";
-import { InferType, array, object, string } from "yup";
+"use client";
 
-import { Form } from "@/components/Form";
-import { FormField } from "@/components/Form/FormField";
+import * as motion from "motion/react-client";
+import clsx from "clsx";
+import { z } from "zod";
+
 import { Loader } from "@/components/Loader";
 import { useAvailableSources } from "@/lib/data/useAvailableSources";
+import { useAppForm } from "@/lib/hooks/useAppForm";
 import {
     CharacterEditorAction,
     useCharacterEditorStore,
@@ -15,33 +14,30 @@ import {
 import { useCharacterSheetStore } from "@/state/characterSheet";
 import { JSONSourceIdentifier } from "@/types/JSONSource";
 
-const formSchema = object({
-    sources: array(string().required()).default([]).required(),
+const formSchema = z.object({
+    sources: z.array(z.string()),
 });
-type FormValues = InferType<typeof formSchema>;
+type FormValues = z.infer<typeof formSchema>;
 
 export function EditSourcesForm() {
-    "use no memo";
-
     const characterSheet = useCharacterSheetStore();
     const characterEditor = useCharacterEditorStore();
 
-    const form = useForm({
-        resolver: yupResolver(formSchema),
+    const form = useAppForm({
+        validators: {
+            onSubmit: formSchema,
+        },
         defaultValues: {
             sources: characterSheet.sources,
+        } as FormValues,
+        onSubmit: async ({ value }) => {
+            characterSheet.setSources(value.sources as JSONSourceIdentifier[]);
+
+            characterEditor.setCurrentAction(CharacterEditorAction.EDIT);
         },
     });
 
-    const selectedSources = form.watch("sources");
-
     const availableSources = useAvailableSources();
-
-    const onSubmit = async (values: FormValues) => {
-        characterSheet.setSources(values.sources as JSONSourceIdentifier[]);
-
-        characterEditor.setCurrentAction(CharacterEditorAction.EDIT);
-    };
 
     if (availableSources.isLoading) {
         return (
@@ -62,78 +58,91 @@ export function EditSourcesForm() {
             }}
             className="flex flex-1 items-center justify-center gap-4"
         >
-            <Form
-                form={form}
-                submitHandler={onSubmit}
-                className="flex flex-col gap-2 rounded-lg border border-gray-200 bg-gray-100 p-2 dark:border-gray-700 dark:bg-gray-800"
+            <form
+                className="flex flex-col gap-2 rounded-lg border border-gray-700 bg-gray-800 p-2"
+                onSubmit={(e) => {
+                    e.preventDefault();
+                    form.handleSubmit();
+                }}
             >
-                <h1 className="text-xl font-bold dark:text-gray-200">
-                    Edit Sources
-                </h1>
+                <form.AppForm>
+                    <h1 className="text-xl font-bold text-gray-200">
+                        Edit Sources
+                    </h1>
 
-                <FormField
-                    name="sources"
-                    label="Selected Sources"
-                    description="Select multiple sources to base your character on"
-                >
-                    <div className="flex max-h-40 flex-col gap-2 overflow-y-auto">
-                        {availableSources.isLoading && (
-                            <>
-                                <div className="h-16 w-full animate-pulse rounded bg-white/10"></div>
-                                <div className="h-16 w-full animate-pulse rounded bg-white/10"></div>
-                            </>
-                        )}
-
-                        {availableSources.data?.map((source) => (
-                            <button
-                                key={source.id}
-                                className={clsx(
-                                    "flex cursor-pointer gap-4 rounded border border-black/10 px-4 py-2 text-left transition-colors dark:border-white/10",
-                                    selectedSources.includes(source.id) &&
-                                        "bg-black/10 dark:bg-white/10",
-                                )}
-                                onClick={() => {
-                                    if (selectedSources.includes(source.id)) {
-                                        form.setValue(
-                                            "sources",
-                                            selectedSources.filter(
-                                                (id) => id !== source.id,
-                                            ),
-                                        );
-                                    } else {
-                                        form.setValue("sources", [
-                                            ...selectedSources,
-                                            source.id,
-                                        ]);
-                                    }
-                                }}
-                                type="button"
+                    <form.AppField name="sources">
+                        {(field) => (
+                            <field.Field
+                                label="Selected Sources"
+                                description="Select multiple sources to base your character on"
                             >
-                                <input
-                                    type="checkbox"
-                                    checked={selectedSources.includes(
-                                        source.id,
+                                <div className="flex max-h-40 flex-col gap-2 overflow-y-auto">
+                                    {availableSources.isLoading && (
+                                        <>
+                                            <div className="h-16 w-full animate-pulse rounded bg-white/10"></div>
+                                            <div className="h-16 w-full animate-pulse rounded bg-white/10"></div>
+                                        </>
                                     )}
-                                    readOnly
-                                />
 
-                                <div className="flex flex-col">
-                                    <p className="font-semibold dark:text-gray-200">
-                                        {source.name}
-                                    </p>
-                                    <p className="text-sm text-black/80 dark:text-white/80">
-                                        {source.description}
-                                    </p>
+                                    {availableSources.data?.map((source) => (
+                                        <button
+                                            key={source.id}
+                                            className={clsx(
+                                                "flex cursor-pointer gap-4 rounded border border-white/10 px-4 py-2 text-left transition-colors",
+                                                field.state.value.includes(
+                                                    source.id,
+                                                ) && "bg-white/10",
+                                            )}
+                                            onClick={() => {
+                                                if (
+                                                    field.state.value.includes(
+                                                        source.id,
+                                                    )
+                                                ) {
+                                                    field.setValue((value) =>
+                                                        value.filter(
+                                                            (id) =>
+                                                                id !==
+                                                                source.id,
+                                                        ),
+                                                    );
+                                                } else {
+                                                    field.setValue((value) => [
+                                                        ...value,
+                                                        source.id,
+                                                    ]);
+                                                }
+                                            }}
+                                            type="button"
+                                        >
+                                            <input
+                                                type="checkbox"
+                                                checked={field.state.value.includes(
+                                                    source.id,
+                                                )}
+                                                readOnly
+                                            />
+
+                                            <div className="flex flex-col">
+                                                <p className="font-semibold text-gray-200">
+                                                    {source.name}
+                                                </p>
+                                                <p className="text-sm text-white/80">
+                                                    {source.description}
+                                                </p>
+                                            </div>
+                                        </button>
+                                    ))}
                                 </div>
-                            </button>
-                        ))}
-                    </div>
-                </FormField>
+                            </field.Field>
+                        )}
+                    </form.AppField>
 
-                <Form.Button size="md" color="primary">
-                    Confirm
-                </Form.Button>
-            </Form>
+                    <form.SubscribeButton size="md" color="primary">
+                        Confirm
+                    </form.SubscribeButton>
+                </form.AppForm>
+            </form>
         </motion.div>
     );
 }

@@ -11,7 +11,7 @@ export async function getSource(id: string) {
 
     const existing = await db.cachedSources.get(formattedId);
 
-    if (existing) {
+    if (existing && process.env.NODE_ENV === "production") {
         if (existing.lastUpdated > addDays(new Date(), -1).getTime()) {
             return existing.content;
         }

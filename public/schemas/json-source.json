@@ -42,9 +42,6 @@
                     },
                     "type": "array"
                   },
-                  "fromVariable": {
-                    "type": "string"
-                  },
                   "name": {
                     "type": "string"
                   },
@@ -62,7 +59,8 @@
                     ],
                     "type": "string"
                   },
-                  "updatesVariable": {
+                  "variable": {
+                    "description": "The variable this field is bound to.",
                     "type": "string"
                   }
                 },

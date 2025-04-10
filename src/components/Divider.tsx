@@ -17,7 +17,7 @@ export const Divider = forwardRef<
                 className,
                 !!children &&
                     clsx(
-                        "flex items-center gap-3 text-sm font-semibold text-black/40 before:flex-1 before:bg-black/20 after:flex-1 after:bg-black/20 dark:text-white/40 dark:before:flex-1 dark:before:bg-white/20 dark:after:flex-1 dark:after:bg-white/20",
+                        "flex items-center gap-3 text-sm font-semibold text-white/40 before:flex-1 before:bg-white/20 after:flex-1 after:bg-white/20",
                         {
                             "before:h-[1px] after:h-[1px]":
                                 orientation === "horizontal",

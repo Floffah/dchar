@@ -109,8 +109,10 @@ export interface JSONSource {
                 default?: string | number | boolean | object | any[];
                 enum?: string[];
 
-                fromVariable?: string;
-                updatesVariable?: string;
+                /**
+                 * The variable this field is bound to.
+                 */
+                variable?: string;
             };
         };
     };

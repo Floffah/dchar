@@ -7,9 +7,28 @@
     "definitions": {
         "pages": {
             "character": {
-                "name": "Character Info"
+                "name": "Character"
+            }
+        },
+        "sections": {
+            "profile": {
+                "name": "Profile",
+                "page": "character"
+            }
+        },
+        "fields": {
+            "name": {
+                "name": "Name",
+                "type": "string",
+                "description": "The name of your character",
+                "variable": "characterName"
+            }
+        },
+        "variables": {
+            "characterName": {
+                "description": "The name of the character"
             }
         }
     },
-    "version": "sha256:57b0b4d0fc3d0833a21b865b2af96bae3ab3480d55a02affffa7f749e26105cc"
+    "version": "sha256:617764f40a2ebf6a80de6f57ca7a395b8a35a3591da69a90088fbf54dc9e9d48"
 }

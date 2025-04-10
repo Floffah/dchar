@@ -18,7 +18,26 @@ export const builtinSources: Record<
             definitions: {
                 pages: {
                     character: {
-                        name: "Character Info",
+                        name: "Character",
+                    },
+                },
+                sections: {
+                    profile: {
+                        name: "Profile",
+                        page: "character",
+                    },
+                },
+                fields: {
+                    name: {
+                        name: "Name",
+                        type: "string",
+                        description: "The name of your character",
+                        variable: "characterName",
+                    },
+                },
+                variables: {
+                    characterName: {
+                        description: "The name of the character",
                     },
                 },
             },
