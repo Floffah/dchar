@@ -1,0 +1,36 @@
+{
+    "source": 1,
+    "id": "base:main",
+    "name": "Base Source",
+    "description": "Base source material. All other sources should depend on this",
+    "lib": true,
+    "definitions": {
+        "pages": {
+            "character": {
+                "name": "Character"
+            }
+        },
+        "sections": {
+            "profile": {
+                "name": "Profile",
+                "page": "character"
+            }
+        },
+        "fields": {
+            "name": {
+                "name": "Name",
+                "section": "profile",
+                "type": "string",
+                "description": "The name of your character",
+                "variable": "characterName",
+                "required": true
+            }
+        },
+        "variables": {
+            "characterName": {
+                "description": "The name of the character"
+            }
+        }
+    },
+    "version": "sha256:ed7da748011b3f4468c7b0b9d9c7d1960ed67459134364d27afb8ae3b8281906"
+}

@@ -1,290 +1,189 @@
-import stylex from "@stylexjs/stylex";
-import { ReactNode, useEffect, useState } from "react";
-import { useForm } from "react-hook-form";
+"use client";
 
-import { Form } from "@/components/Form";
-import { useVariable } from "@/hooks/sources";
-import { SourceSetEditWizardPage } from "@/lib/Source/SourceSetEditWizard";
-import {
-    CHARACTER_LIST,
-    getSavedSourceSets,
-    serializeSavableSourceSet,
-} from "@/lib/Source/persistence";
-import {
-    CharacterSheetSectionConstants,
-    CharacterSheetVariableConstants,
-} from "@/lib/constants";
-import { colours } from "@/styles/colours.stylex";
-import { fontSizes, fontWeights, lineHeights } from "@/styles/fonts.stylex";
-import { rounded } from "@/styles/rounded.stylex";
-import { maxWidths, sizes } from "@/styles/sizes.stylex";
+import { Fragment, useMemo } from "react";
 
-function getDefaultValuesForPage(page: SourceSetEditWizardPage) {
-    const defaultValues: Record<string, any> = {};
+import { CharacterEditorNavigation } from "@/app/character/EditCharacter/CharacterEditorNavigation";
+import { Button } from "@/components/Button";
+import { Divider } from "@/components/Divider";
+import { useCombinedSourcesQuery } from "@/lib/data/useCombinedSourcesQuery";
+import { useAppForm } from "@/lib/hooks/useAppForm";
+import { useCharacterSheetStore } from "@/state/characterSheet";
 
-    for (const section of Object.values(page.sections)) {
-        for (const field of Object.values(section.fields)) {
-            let defaultValue = field.default;
+export function EditCharacterPage({ page }: { page: string }) {
+    const sheet = useCharacterSheetStore();
 
-            if (field.variable) {
-                defaultValue = page.sourceSet.getVariable(field.variable);
+    const combinedSources = useCombinedSourcesQuery();
+
+    const sections = useMemo(
+        () =>
+            Object.entries(combinedSources.data?.sections ?? {})
+                .filter(([, v]) => v.page === page)
+                .map(([k]) => k),
+        [combinedSources.data?.sections, page],
+    );
+
+    const initialDefaultValues = useMemo(() => {
+        const defaultValues = {} as any;
+
+        for (const [name, field] of Object.entries(
+            combinedSources.data?.fields ?? {},
+        )) {
+            if (sections.includes(field.section)) {
+                if (typeof field.default !== "undefined") {
+                    defaultValues[name] = field.default;
+                } else if (field.variable) {
+                    const variableValue = sheet.variables[field.variable];
+
+                    defaultValues[name] = variableValue.value;
+                }
             }
-
-            defaultValues[section.id + ":" + field.id] = defaultValue;
         }
-    }
 
-    return defaultValues;
-}
+        return defaultValues;
+    }, [combinedSources.data?.fields, sections, sheet.variables]);
 
-export function EditCharacterPage({
-    page,
-    hasNext,
-    onRequestNextPage,
-}: {
-    page: SourceSetEditWizardPage;
-    hasNext: boolean;
-    onRequestNextPage: () => void;
-}) {
-    const characterName = useVariable(
-        CharacterSheetVariableConstants.CHARACTER_NAME,
-    );
+    const form = useAppForm({
+        defaultValues: initialDefaultValues,
+        onSubmit: async ({ value }) => {
+            for (const key of Object.keys(value)) {
+                const field = combinedSources.data?.fields[key];
 
-    const [defaultValues, setDefaultValues] = useState(() =>
-        getDefaultValuesForPage(page),
-    );
+                if (field?.variable) {
+                    sheet.setVariable(field.variable, value[key]);
 
-    const form = useForm({
-        defaultValues,
+                    if (field.variable === "characterName") {
+                        sheet.setName(value[key]);
+                    }
+                }
+            }
+        },
     });
 
-    const [justSubmitted, setJustSubmitted] = useState(false);
-
-    const reset = () => {
-        const newDefaultValues = getDefaultValuesForPage(page);
-        setDefaultValues(newDefaultValues);
-
-        form.reset(newDefaultValues);
-    };
-
-    const onSubmit = async (values: any) => {
-        const variablesToSet: Record<string, any> = {};
-
-        for (const [key, value] of Object.entries(values)) {
-            const [sectionId, fieldId] = key.split(":");
-
-            const field = page.sections[sectionId].fields[fieldId];
-
-            if (field.validate) {
-                const error = field.validate(value);
-
-                if (error) {
-                    form.setError(key, {
-                        message: error,
-                    });
-                    return;
-                }
-            }
-
-            if (field.variable) {
-                variablesToSet[field.variable] = value;
-            }
-
-            if (field.onchange) {
-                field.onchange(value);
-            }
-        }
-
-        if (
-            CharacterSheetVariableConstants.CHARACTER_NAME in variablesToSet &&
-            variablesToSet[CharacterSheetVariableConstants.CHARACTER_NAME] !==
-                defaultValues[CharacterSheetVariableConstants.CHARACTER_NAME]
-        ) {
-            const savedSets = getSavedSourceSets();
-
-            if (
-                savedSets.some(
-                    (set) =>
-                        set.variables[
-                            CharacterSheetVariableConstants.CHARACTER_NAME
-                        ].value === variablesToSet.characterName,
-                )
-            ) {
-                form.setError(
-                    CharacterSheetSectionConstants.DETAILS +
-                        ":" +
-                        CharacterSheetVariableConstants.CHARACTER_NAME,
-                    {
-                        message: "Character name already exists",
-                    },
-                );
-                return;
-            }
-
-            const newSavedSets = savedSets.filter(
-                (set) =>
-                    set.variables[
-                        CharacterSheetVariableConstants.CHARACTER_NAME
-                    ].value !== characterName,
-            );
-
-            localStorage.setItem(
-                CHARACTER_LIST,
-                JSON.stringify(
-                    newSavedSets.map((set) => serializeSavableSourceSet(set)),
-                ),
-            );
-        }
-
-        for (const [name, value] of Object.entries(variablesToSet)) {
-            page.sourceSet.setVariable(name, value);
-        }
-
-        await new Promise((resolve) => setTimeout(resolve, 1000));
-
-        setJustSubmitted(true);
-
-        reset();
-    };
-
-    const renderSections = () => {
-        const sections: ReactNode[] = [];
-
-        for (const section of Object.values(page.sections)) {
-            const fields: ReactNode[] = [];
-
-            for (const field of Object.values(section.fields)) {
-                if (field.type === "string") {
-                    fields.push(
-                        <Form.Input
-                            key={field.id}
-                            name={section.id + ":" + field.id}
-                            label={field.label}
-                            description={field.description}
-                            required={field.required}
-                        />,
-                    );
-                } else if (field.type === "textarea") {
-                    fields.push(
-                        <Form.TextArea
-                            key={field.id}
-                            name={section.id + ":" + field.id}
-                            label={field.label}
-                            description={field.description}
-                            required={field.required}
-                            minRows={3}
-                            maxRows={6}
-                        />,
-                    );
-                }
-            }
-
-            sections.push(
-                <div
-                    key={section.id}
-                    {...stylex.props(styles.sectionContainer)}
-                >
-                    <h2 {...stylex.props(styles.sectionHeading)}>
-                        {section.name}
-                    </h2>
-
-                    {fields}
-                </div>,
-            );
-        }
-
-        return sections;
-    };
-
-    useEffect(() => {
-        const timeout = setTimeout(() => {
-            setJustSubmitted(false);
-        }, 3000);
-
-        return () => clearTimeout(timeout);
-    }, [justSubmitted]);
-
     return (
-        <div {...stylex.props(styles.container)}>
-            <Form
-                form={form}
-                submitHandler={onSubmit}
-                {...stylex.props(styles.form)}
-            >
-                <div {...stylex.props(styles.formSectionsContainer)}>
-                    {renderSections()}
-                </div>
+        <form
+            className="flex flex-1 flex-col gap-4"
+            onSubmit={(e) => {
+                e.preventDefault();
+                form.handleSubmit();
+            }}
+        >
+            <form.AppForm>
+                <div className="flex flex-1 flex-col gap-4">
+                    {sections.map((sectionName, i) => {
+                        const fields = Object.entries(
+                            combinedSources.data?.fields ?? {},
+                        ).filter(([, v]) => v.section === sectionName);
 
-                <div {...stylex.props(styles.formButtonsContainer)}>
-                    {justSubmitted && (
-                        <p {...stylex.props(styles.formSavedMessage)}>Saved!</p>
-                    )}
+                        const section =
+                            combinedSources.data?.sections[sectionName];
 
-                    <Form.Button color="primary" size="md">
-                        Save
-                    </Form.Button>
-                    <Form.Button
-                        color="secondary"
-                        size="md"
-                        disabled={!hasNext}
-                        onAfterSubmit={onRequestNextPage}
-                    >
-                        Save & Next Page
-                    </Form.Button>
+                        if (!section) {
+                            return null;
+                        }
+
+                        return (
+                            <Fragment key={sectionName}>
+                                {i > 0 && <Divider orientation="horizontal" />}
+
+                                <div
+                                    key={sectionName}
+                                    className="flex flex-col gap-2"
+                                >
+                                    <h2 className="text-xl font-bold text-gray-200">
+                                        {section.name}
+                                    </h2>
+
+                                    {fields.map(([fieldId, fieldData]) => (
+                                        <form.AppField
+                                            name={fieldId}
+                                            key={fieldId}
+                                            validators={{
+                                                onSubmit: ({ value }) => {
+                                                    if (
+                                                        !value &&
+                                                        fieldData.required
+                                                    ) {
+                                                        return "This field is required";
+                                                    }
+
+                                                    if (
+                                                        fieldData.type ===
+                                                        "string"
+                                                    ) {
+                                                        if (
+                                                            typeof value !==
+                                                            "string"
+                                                        ) {
+                                                            return "This field must be a string";
+                                                        }
+
+                                                        if (
+                                                            fieldData.required &&
+                                                            !value.trim()
+                                                        ) {
+                                                            return "This field cannot be empty";
+                                                        }
+                                                    }
+                                                },
+                                            }}
+                                        >
+                                            {(field) => {
+                                                if (
+                                                    fieldData.type === "string"
+                                                ) {
+                                                    return (
+                                                        <field.Input
+                                                            label={
+                                                                fieldData.name
+                                                            }
+                                                            description={
+                                                                fieldData.description
+                                                            }
+                                                            disabled={
+                                                                !fieldData.variable
+                                                            }
+                                                        />
+                                                    );
+                                                }
+
+                                                return (
+                                                    <field.Field
+                                                        label={fieldData.name}
+                                                        description={
+                                                            fieldData.description
+                                                        }
+                                                    >
+                                                        <p className="text-white italic">
+                                                            {field.state.value}
+                                                        </p>
+                                                    </field.Field>
+                                                );
+                                            }}
+                                        </form.AppField>
+                                    ))}
+                                </div>
+                            </Fragment>
+                        );
+                    })}
                 </div>
-            </Form>
-        </div>
+                <div className="flex flex-shrink-0 justify-between gap-2">
+                    <CharacterEditorNavigation className="flex-shrink-0" />
+
+                    <div className="flex flex-shrink-0 gap-2">
+                        <Button
+                            size="md"
+                            color="secondary"
+                            type="button"
+                            onClick={() => form.reset()}
+                        >
+                            Reset
+                        </Button>
+                        <form.SubscribeButton size="md" color="primary">
+                            Save
+                        </form.SubscribeButton>
+                    </div>
+                </div>
+            </form.AppForm>
+        </form>
     );
 }
-
-const DARK = "@media (prefers-color-scheme: dark)";
-const SM_BREAKPOINT = "@media (min-width: 640px)";
-const styles = stylex.create({
-    container: {
-        display: "flex",
-        flexGrow: 1,
-        justifyContent: "center",
-        padding: sizes.spacing4,
-        borderRadius: rounded.lg,
-        backgroundColor: {
-            default: colours.gray200,
-            [DARK]: colours.gray800,
-        },
-    },
-
-    form: {
-        display: "flex",
-        flexDirection: "column",
-        flexGrow: 1,
-        justifyContent: "space-between",
-        maxWidth: {
-            default: "none",
-            [SM_BREAKPOINT]: maxWidths.md,
-        },
-    },
-    formSectionsContainer: {
-        display: "flex",
-        flexDirection: "column",
-        gap: sizes.spacing4,
-    },
-    formButtonsContainer: {
-        display: "flex",
-        gap: sizes.spacing2,
-        alignItems: "center",
-        justifyContent: "flex-end",
-    },
-    formSavedMessage: {
-        color: colours.green500,
-    },
-
-    sectionContainer: {
-        display: "flex",
-        flexDirection: "column",
-        gap: sizes.spacing2,
-    },
-    sectionHeading: {
-        fontSize: fontSizes.xl,
-        lineHeight: lineHeights.xl,
-        fontWeight: fontWeights.bold,
-    },
-});

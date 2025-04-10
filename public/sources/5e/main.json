@@ -1,0 +1,11 @@
+{
+    "source": 1,
+    "id": "5e:main",
+    "name": "Fifth Edition",
+    "description": "Dungeons & Dragons Fifth Edition source material",
+    "extends": [
+        "base:main"
+    ],
+    "definitions": {},
+    "version": "sha256:c69b0d00b59061a8524ae0433a2271fe4d40a30444dbe4be4b7a636869cf8a81"
+}

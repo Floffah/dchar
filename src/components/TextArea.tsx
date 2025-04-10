@@ -1,73 +1,33 @@
-import stylex, { StyleXStyles } from "@stylexjs/stylex";
+import clsx from "clsx";
 import { ComponentProps, forwardRef } from "react";
 import TextareaAutosize from "react-textarea-autosize";
 
-import { composeStyles } from "@/lib/utils/composeStyles";
-import { fontSizes, lineHeights } from "@/styles/fonts.stylex";
-import { rounded } from "@/styles/rounded.stylex";
-import { sizes } from "@/styles/sizes.stylex";
-import { theme } from "@/styles/theme.stylex";
-
-export interface TextAreaProps
-    extends Omit<ComponentProps<typeof TextareaAutosize>, "style" | "ref"> {
+export interface TextAreaProps extends ComponentProps<typeof TextareaAutosize> {
     error?: boolean;
-    style?: StyleXStyles;
 }
 
 export const TextArea = forwardRef<HTMLTextAreaElement, TextAreaProps>(
-    ({ className, style, error, disabled, ...props }, ref) => {
+    ({ className, error, disabled, ...props }, ref) => {
         return (
             <TextareaAutosize
                 {...props}
                 ref={ref}
                 disabled={disabled}
-                {...composeStyles(
-                    stylex.props(
-                        styles.base,
-                        error && !disabled && styles.error,
-                        disabled && styles.disabled,
-                        error && disabled && styles.disabledError,
-                        style,
-                    ),
+                className={clsx(
                     className,
+                    "rounded-lg border border-gray-700 bg-transparent px-2 py-1 placeholder-white/40 ring-0 transition-colors duration-150 outline-none focus:ring-1 focus:ring-offset-0",
+                    {
+                        "focus:border-blue-600 focus:ring-blue-600":
+                            !error && !disabled,
+                        "border-red-500 focus:border-red-500 focus:ring-red-500":
+                            error && !disabled,
+                        "border-red-500/60": error && disabled,
+
+                        "pointer-events-none border-gray-700/60 bg-gray-800/60 text-white/60 select-none":
+                            disabled,
+                    },
                 )}
-            ></TextareaAutosize>
+            />
         );
     },
 );
-
-const styles = stylex.create({
-    base: {
-        transitionProperty: "color, background-color, border-color",
-        transitionDuration: "150ms",
-        background: theme.controlBackground,
-        borderRadius: rounded.lg,
-        border: {
-            default: theme.controlBorder,
-            ":focus": theme.controlFocusedBorder,
-        },
-        outline: "none",
-        padding: `${sizes.spacing1} ${sizes.spacing2}`,
-        fontSize: fontSizes.base,
-        lineHeight: lineHeights.base,
-        color: {
-            "::placeholder": theme.controlPlaceholderForeground,
-        },
-    },
-
-    error: {
-        border: theme.controlErrorBorder,
-    },
-
-    disabled: {
-        color: {
-            default: theme.controlDisabledForeground,
-            "::placeholder": theme.controlDisabledPlaceholderForeground,
-        },
-        border: theme.controlDisabledBorder,
-    },
-
-    disabledError: {
-        border: theme.controlDisabledErrorBorder,
-    },
-});

@@ -1,8 +1,8 @@
 "use client";
 
 import { Slot } from "@radix-ui/react-slot";
-import stylex, { StyleXStyles } from "@stylexjs/stylex";
-import { useRouter } from "next/navigation";
+import clsx from "clsx";
+import { usePathname, useRouter } from "next/navigation";
 import {
     ComponentProps,
     ReactElement,
@@ -10,28 +10,21 @@ import {
     cloneElement,
     createContext,
     forwardRef,
-    isValidElement,
     useEffect,
     useState,
 } from "react";
 
 import { Icon, IconProps } from "@/components/Icon";
 import { Loader } from "@/components/Loader";
-import { composeStyles } from "@/lib/utils/composeStyles";
-import { fontSizes, lineHeights } from "@/styles/fonts.stylex";
-import { rounded } from "@/styles/rounded.stylex";
-import { sizes } from "@/styles/sizes.stylex";
-import { theme } from "@/styles/theme.stylex";
 
-export interface ButtonProps extends Omit<ComponentProps<"button">, "style"> {
+export interface ButtonProps extends ComponentProps<"button"> {
     asChild?: boolean;
     size: "sm" | "md";
     color: "primary" | "secondary" | "success" | "danger";
     loading?: boolean;
-    icon?: IconProps["icon"];
+    icon?: IconProps["children"];
     iconLabel?: string;
     link?: string;
-    style?: StyleXStyles;
 }
 
 const ButtonContext = createContext<ButtonProps>(null!);
@@ -43,12 +36,12 @@ export const Button = forwardRef<HTMLButtonElement, ButtonProps>(
         const {
             asChild,
             className,
-            style,
             size = "md",
             color,
             link,
             icon,
             iconLabel,
+            disabled: propsDisabled,
             loading: propsLoading,
             children: propsChildren,
             onClick,
@@ -63,7 +56,9 @@ export const Button = forwardRef<HTMLButtonElement, ButtonProps>(
 
         const Component =
             asChild && typeof propsChildren !== "string" ? Slot : "button";
-        const disabled = loading || props.disabled;
+        const disabled = loading || propsDisabled;
+
+        const currentPathname = usePathname();
 
         useEffect(() => {
             setLoading(!!propsLoading);
@@ -75,37 +70,32 @@ export const Button = forwardRef<HTMLButtonElement, ButtonProps>(
             }
         }, [link, router]);
 
+        useEffect(() => {
+            if (loading && link && currentPathname === link) {
+                setLoading(false);
+            }
+        }, [currentPathname, loading, link]);
+
         const children = (
             <>
                 {loading && (
                     <Loader
-                        {...stylex.props(
-                            disabled && styles.iconDisabled,
+                        className={clsx({
+                            "opacity-60": disabled,
 
-                            size === "sm" && styles.iconSm,
-                            size === "md" && styles.iconMd,
-                        )}
+                            "h-4 w-4": size === "sm",
+                            "h-5 w-5": size === "md",
+                        })}
                     />
                 )}
 
-                {icon &&
-                    !loading &&
-                    (isValidElement(icon) || "render" in icon ? (
-                        <Icon
-                            {...stylex.props(
-                                disabled && styles.iconDisabled,
+                {icon && !loading && (
+                    <Icon size={size} label={iconLabel ?? "button"}>
+                        {icon}
+                    </Icon>
+                )}
 
-                                size === "sm" && styles.iconSm,
-                                size === "md" && styles.iconMd,
-                            )}
-                            label={iconLabel ?? "button"}
-                            icon={icon}
-                        />
-                    ) : (
-                        (icon as any)
-                    ))}
-
-                <span {...stylex.props(styles.childrenContainer)}>
+                <span className="flex items-center gap-2">
                     {propsChildren &&
                     typeof propsChildren === "object" &&
                     "props" in propsChildren &&
@@ -120,22 +110,21 @@ export const Button = forwardRef<HTMLButtonElement, ButtonProps>(
             <ButtonContext.Provider value={baseProps}>
                 <Component
                     ref={ref as any}
-                    {...composeStyles(
-                        stylex.props(
-                            style,
-                            // base states
-                            styles.base,
-                            disabled && styles.disabled,
-                            // sizes
-                            size === "sm" && styles.sizeSm,
-                            size === "md" && styles.sizeMd,
-                            // colours
-                            color === "primary" && styles.primary,
-                            color === "secondary" && styles.secondary,
-                            color === "success" && styles.success,
-                            color === "danger" && styles.danger,
-                        ),
+                    className={clsx(
                         className,
+                        "flex h-fit cursor-pointer items-center justify-center space-x-1 transition-[opacity,color,background-color] duration-150",
+                        {
+                            "pointer-events-none cursor-not-allowed opacity-60":
+                                disabled,
+
+                            "rounded-lg px-2 py-1 text-sm": size === "sm",
+                            "rounded-lg px-3 py-1.5": size === "md",
+
+                            "bg-blue-700 text-white": color === "primary",
+                            "bg-green-700 text-white": color === "success",
+                            "bg-gray-700 text-white": color === "secondary",
+                            "bg-red-800 text-white": color === "danger",
+                        },
                     )}
                     onClick={async (e) => {
                         setLoading(true);
@@ -164,75 +153,3 @@ export const Button = forwardRef<HTMLButtonElement, ButtonProps>(
         );
     },
 );
-
-const styles = stylex.create({
-    // base states
-    base: {
-        transitionProperty: "opacity, color, background-color",
-        transitionDelay: "150ms",
-        display: "flex",
-        alignItems: "center",
-        justifyContent: "center",
-        height: "fit-content",
-        gap: sizes.spacing1,
-        border: "none",
-        cursor: "pointer",
-    },
-    disabled: {
-        pointerEvents: "none",
-        cursor: "not-allowed",
-        opacity: 0.6,
-    },
-
-    // sizes
-    sizeSm: {
-        padding: `${sizes.spacing1} ${sizes.spacing2}`,
-        fontSize: fontSizes.sm,
-        lineHeight: lineHeights.sm,
-        borderRadius: rounded.lg,
-    },
-    sizeMd: {
-        padding: `${sizes.spacing1_5} ${sizes.spacing3}`,
-        fontSize: fontSizes.base,
-        lineHeight: lineHeights.base,
-        borderRadius: rounded.lg,
-    },
-
-    // colours
-    primary: {
-        backgroundColor: theme.primaryBackground,
-        color: theme.primaryForeground,
-    },
-    secondary: {
-        backgroundColor: theme.secondaryBackground,
-        color: theme.secondaryForeground,
-    },
-    success: {
-        backgroundColor: theme.successBackground,
-        color: theme.successForeground,
-    },
-    danger: {
-        backgroundColor: theme.dangerBackground,
-        color: theme.dangerForeground,
-    },
-
-    // icon styles
-    iconDisabled: {
-        opacity: 0.6,
-    },
-    iconSm: {
-        height: sizes.spacing4,
-        width: sizes.spacing4,
-    },
-    iconMd: {
-        height: sizes.spacing5,
-        width: sizes.spacing5,
-    },
-
-    // util
-    childrenContainer: {
-        display: "flex",
-        alignItems: "center",
-        gap: sizes.spacing2,
-    },
-});

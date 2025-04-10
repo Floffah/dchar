@@ -1,45 +1,22 @@
 "use client";
 
-import stylex, { StyleXStyles } from "@stylexjs/stylex";
-import { forwardRef } from "react";
+import clsx from "clsx";
+import { LoaderCircleIcon } from "lucide-react";
+import { ComponentProps, forwardRef } from "react";
 
-import LoadingIcon from "~icons/mdi/loading";
-
-import { Icon, IconProps } from "@/components/Icon";
-import { composeStyles } from "@/lib/utils/composeStyles";
+import { Icon } from "@/components/Icon";
 
 export const Loader = forwardRef<
     SVGSVGElement,
-    Omit<IconProps, "ref" | "label" | "icon">
->(({ className, style, ...props }, ref) => {
+    Omit<ComponentProps<typeof LoaderCircleIcon>, "ref" | "label" | "icon">
+>(({ className, ...props }, ref) => {
     return (
-        <Icon
-            label="loading"
-            icon={LoadingIcon}
-            ref={ref}
-            {...composeStyles(
-                stylex.props(styles.base, style as StyleXStyles),
-                className,
-            )}
-            {...props}
-        />
+        <Icon label="loading">
+            <LoaderCircleIcon
+                ref={ref}
+                className={clsx("animate-spin", className)}
+                {...props}
+            />
+        </Icon>
     );
-});
-
-export const spin = stylex.keyframes({
-    from: {
-        transform: "rotate(0deg)",
-    },
-    to: {
-        transform: "rotate(360deg)",
-    },
-});
-
-const styles = stylex.create({
-    base: {
-        animationName: spin,
-        animationDuration: "1s",
-        animationTimingFunction: "linear",
-        animationIterationCount: "infinite",
-    },
 });

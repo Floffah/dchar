@@ -2,27 +2,12 @@
 
 import {
     QueryClient,
-    QueryClientProvider as TRQQueryClientProvider,
+    QueryClientProvider as RQProvider,
 } from "@tanstack/react-query";
 import { PropsWithChildren, useMemo } from "react";
 
 export function QueryClientProvider({ children }: PropsWithChildren) {
-    const client = useMemo(
-        () =>
-            new QueryClient({
-                defaultOptions: {
-                    queries: {
-                        refetchOnWindowFocus: false,
-                        staleTime: 1000 * 60 * 5,
-                    },
-                },
-            }),
-        [],
-    );
+    const client = useMemo(() => new QueryClient(), []);
 
-    return (
-        <TRQQueryClientProvider client={client}>
-            {children}
-        </TRQQueryClientProvider>
-    );
+    return <RQProvider client={client}>{children}</RQProvider>;
 }

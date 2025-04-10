@@ -1,68 +1,22 @@
-import stylex from "@stylexjs/stylex";
-
-import { CreateCharacterForm } from "@/app/CreateCharacterForm";
-import { LoadCharacterSheet } from "@/app/LoadCharacterSheet";
+import { LoadCharacterList } from "@/app/LoadCharacterList";
+import { NewCharacterForm } from "@/app/NewCharacterForm";
 import { Divider } from "@/components/Divider";
-import { rounded } from "@/styles/rounded.stylex";
-import { sizes } from "@/styles/sizes.stylex";
-import { theme } from "@/styles/theme.stylex";
 
 export default function Home() {
     return (
-        <div {...stylex.props(styles.container)}>
-            <main {...stylex.props(styles.modal)}>
-                <CreateCharacterForm />
+        <div className="flex h-screen items-center justify-center">
+            <main className="flex flex-col gap-4 rounded-lg border border-gray-800 bg-gray-900 p-4 md:flex-row">
+                <NewCharacterForm />
 
-                <Divider
-                    orientation="vertical"
-                    {...stylex.props(styles.verticalDivider)}
-                >
+                <Divider orientation="horizontal" className="flex md:hidden">
                     OR
                 </Divider>
-                <Divider
-                    orientation="horizontal"
-                    {...stylex.props(styles.horizontalDivider)}
-                >
+                <Divider orientation="vertical" className="hidden md:flex">
                     OR
                 </Divider>
 
-                <LoadCharacterSheet />
+                <LoadCharacterList />
             </main>
         </div>
     );
 }
-
-const MD_BREAKPOINT = "@media (min-width: 768px)";
-const styles = stylex.create({
-    container: {
-        display: "flex",
-        height: sizes.h_screen,
-        alignItems: "center",
-        justifyContent: "center",
-        padding: sizes.spacing4,
-    },
-    modal: {
-        display: "flex",
-        flexDirection: {
-            default: "column",
-            [MD_BREAKPOINT]: "row",
-        },
-        gap: sizes.spacing4,
-        borderRadius: rounded.lg,
-        backgroundColor: theme.modalBackground,
-        padding: sizes.spacing4,
-    },
-
-    verticalDivider: {
-        display: {
-            default: "none !important",
-            [MD_BREAKPOINT]: "flex !important",
-        },
-    },
-    horizontalDivider: {
-        display: {
-            default: "flex !important",
-            [MD_BREAKPOINT]: "none !important",
-        },
-    },
-});

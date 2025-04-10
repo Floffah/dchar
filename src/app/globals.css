@@ -1,15 +1,10 @@
-@import "normalize.css/normalize.css";
+@import "tailwindcss";
 
-/* Resets */
+@plugin "@tailwindcss/typography";
 
-p,
-h1,
-h2,
-h3,
-h4,
-h5,
-h6 {
-    margin: 0;
+@theme {
+    --font-sans: initial;
+    --font-mono: initial;
+
+    --default-transition-duration: 150ms;
 }
-
-@stylex;

@@ -1,71 +1,32 @@
-import stylex, { StyleXStyles } from "@stylexjs/stylex";
+import clsx from "clsx";
 import { ComponentProps, forwardRef } from "react";
 
-import { composeStyles } from "@/lib/utils/composeStyles";
-import { fontSizes, lineHeights } from "@/styles/fonts.stylex";
-import { rounded } from "@/styles/rounded.stylex";
-import { sizes } from "@/styles/sizes.stylex";
-import { theme } from "@/styles/theme.stylex";
-
-export interface InputProps extends Omit<ComponentProps<"input">, "style"> {
-    error?: boolean;
-    style?: StyleXStyles;
+export interface InputProps extends ComponentProps<"input"> {
+    hasError?: boolean;
 }
 
 export const Input = forwardRef<HTMLInputElement, InputProps>(
-    ({ className, style, error, disabled, ...props }, ref) => {
+    ({ className, hasError, disabled, ...props }, ref) => {
         return (
             <input
                 {...props}
                 ref={ref}
                 disabled={disabled}
-                {...composeStyles(
-                    stylex.props(
-                        style,
-                        styles.base,
-                        error && !disabled && styles.error,
-                        disabled && styles.disabled,
-                        error && disabled && styles.disabledError,
-                    ),
+                className={clsx(
                     className,
+                    "rounded-lg border border-gray-700 bg-transparent px-2 py-1 text-white placeholder-white/40 ring-0 transition-colors duration-150 outline-none focus:ring-1 focus:ring-offset-0",
+                    {
+                        "focus:border-blue-600 focus:ring-blue-600":
+                            !hasError && !disabled,
+                        "border-red-500 focus:border-red-500 focus:ring-red-500":
+                            hasError && !disabled,
+                        "border-red-500/60": hasError && disabled,
+
+                        "pointer-events-none border-gray-700/60 bg-gray-800/60 text-white/60 select-none":
+                            disabled,
+                    },
                 )}
             ></input>
         );
     },
 );
-
-const styles = stylex.create({
-    base: {
-        transitionProperty: "color, background-color, border-color",
-        transitionDuration: "150ms",
-        background: theme.controlBackground,
-        borderRadius: rounded.lg,
-        border: {
-            default: theme.controlBorder,
-            ":focus": theme.controlFocusedBorder,
-        },
-        outline: "none",
-        padding: `${sizes.spacing1} ${sizes.spacing2}`,
-        fontSize: fontSizes.base,
-        lineHeight: lineHeights.base,
-        color: {
-            "::placeholder": theme.controlPlaceholderForeground,
-        },
-    },
-
-    error: {
-        border: theme.controlErrorBorder,
-    },
-
-    disabled: {
-        color: {
-            default: theme.controlDisabledForeground,
-            "::placeholder": theme.controlDisabledPlaceholderForeground,
-        },
-        border: theme.controlDisabledBorder,
-    },
-
-    disabledError: {
-        border: theme.controlDisabledErrorBorder,
-    },
-});

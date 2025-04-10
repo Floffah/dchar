@@ -1,190 +1,104 @@
 "use client";
 
-import * as Tabs from "@radix-ui/react-tabs";
-import stylex, { StyleXStyles } from "@stylexjs/stylex";
-import Link from "next/link";
+import { useQuery } from "@tanstack/react-query";
 import { useRouter } from "next/navigation";
 import { useEffect } from "react";
 
-import EyeIcon from "~icons/mdi/eye-outline";
-import HomeIcon from "~icons/mdi/home-outline";
-import PencilIcon from "~icons/mdi/pencil-outline";
-
+import { CharacterSheetNavBar } from "@/app/character/CharacterSheetNavBar";
 import { EditCharacter } from "@/app/character/EditCharacter";
-import { LoadingSourcesLoader } from "@/app/character/LoadingSourcesLoader";
-import { Button } from "@/components/Button";
-import { useVariable } from "@/hooks/sources";
-import { CharacterSheetVariableConstants } from "@/lib/constants";
-import { useSources } from "@/providers/SourcesProvider";
-import { colours } from "@/styles/colours.stylex";
-import { fontSizes, fontWeights } from "@/styles/fonts.stylex";
-import { rounded } from "@/styles/rounded.stylex";
-import { sizes } from "@/styles/sizes.stylex";
+import { EditSourcesForm } from "@/app/character/EditSourcesForm";
+import { Loader } from "@/components/Loader";
+import {
+    parseSheet,
+    stringifySheet,
+} from "@/lib/characterSheets/stringifySheet";
+import { useCombinedSourcesQuery } from "@/lib/data/useCombinedSourcesQuery";
+import {
+    CharacterEditorAction,
+    useCharacterEditorStore,
+} from "@/state/characterEditor";
+import { useCharacterSheetStore } from "@/state/characterSheet";
+import { CharacterSheet } from "@/types/CharacterSheet";
 
-export default function CharacterPage() {
+export default function CharacterPage({
+    searchParams,
+}: {
+    searchParams: Promise<{ data: string }>;
+}) {
     const router = useRouter();
-    const sources = useSources();
 
-    const characterName = useVariable(
-        CharacterSheetVariableConstants.CHARACTER_NAME,
+    const characterSheet = useCharacterSheetStore();
+    const currentAction = useCharacterEditorStore(
+        (state) => state.currentAction,
     );
+
+    const initialiseCharacterQuery = useQuery({
+        queryKey: ["initialiseCharacterState"],
+        queryFn: async () => {
+            const { data } = await searchParams;
+
+            if (!data) {
+                router.push("/");
+                throw "Aborted";
+            }
+
+            const sheet = parseSheet(data);
+
+            characterSheet.initFromSheet(sheet);
+
+            return sheet;
+        },
+    });
+
+    const combinedSourcesQuery = useCombinedSourcesQuery({
+        enabled: initialiseCharacterQuery.isSuccess,
+        refetchOnSourcesChange: true,
+    });
 
     useEffect(() => {
-        const params = new URLSearchParams(window.location.search);
+        const searchParams = new URLSearchParams(window.location.search);
 
-        if (!params.has("data")) {
-            router.replace("/");
+        if (searchParams.has("data")) {
+            const newSheet = {
+                sources: characterSheet.sources,
+                variables: characterSheet.variables,
+            } as CharacterSheet;
+
+            searchParams.set("data", stringifySheet(newSheet));
+
+            window.history.replaceState(
+                null,
+                "",
+                `${window.location.pathname}?${searchParams}`,
+            );
         }
-    }, []);
-
-    if (sources.isLoading) {
-        return <LoadingSourcesLoader />;
-    }
+    }, [characterSheet.sources, characterSheet.variables]);
 
     return (
-        <Tabs.Root defaultValue="edit" {...stylex.props(styles.container)}>
-            <header {...stylex.props(styles.headerSection)}>
-                <Button size="sm" color="secondary" icon={HomeIcon} asChild>
-                    <Link href="/">Home</Link>
-                </Button>
+        <div className="flex h-screen flex-col gap-4 p-4">
+            <CharacterSheetNavBar />
 
-                <span {...stylex.props(styles.sheetTypeText)}>
-                    Character Sheet
-                </span>
-
-                <h1 {...stylex.props(styles.characterName)}>{characterName}</h1>
-
-                {/* TODO: abstract tabs to their own component */}
-                <Tabs.List {...stylex.props(styles.tabButtonList)}>
-                    <Tabs.Trigger
-                        value="view"
-                        {...stylex.props(styles.tabButton, {
-                            borderTopRightRadius: 0,
-                            borderBottomRightRadius: 0,
-                        } as unknown as StyleXStyles)}
-                    >
-                        <EyeIcon />
-                        View
-                    </Tabs.Trigger>
-                    <Tabs.Trigger
-                        value="edit"
-                        {...stylex.props(styles.tabButton, {
-                            borderTopLeftRadius: 0,
-                            borderBottomLeftRadius: 0,
-                        } as unknown as StyleXStyles)}
-                    >
-                        <PencilIcon />
-                        Edit
-                    </Tabs.Trigger>
-                </Tabs.List>
-            </header>
-
-            <Tabs.Content
-                value="view"
-                {...stylex.props(
-                    styles.baseTabContentBox,
-                    styles.viewTabContentBox,
+            {initialiseCharacterQuery.isLoading &&
+                combinedSourcesQuery.isLoading && (
+                    <div className="m-auto flex flex-col gap-2 text-white/50">
+                        <Loader className="m-auto" />
+                        <p className="text-sm">Loading sources...</p>
+                    </div>
                 )}
-            >
-                <p>
-                    Page content not implemented yet. Click the edit button to
-                    prepare
-                </p>
-            </Tabs.Content>
 
-            <Tabs.Content
-                value="edit"
-                {...stylex.props(
-                    styles.baseTabContentBox,
-                    styles.editTabContentBox,
-                )}
-                asChild
-            >
-                <EditCharacter />
-            </Tabs.Content>
-        </Tabs.Root>
+            {initialiseCharacterQuery.data && combinedSourcesQuery.data && (
+                <>
+                    {currentAction === CharacterEditorAction.VIEW && (
+                        <p>Not Implemented</p>
+                    )}
+                    {currentAction === CharacterEditorAction.EDIT && (
+                        <EditCharacter />
+                    )}
+                    {currentAction === CharacterEditorAction.EDIT_SOURCES && (
+                        <EditSourcesForm />
+                    )}
+                </>
+            )}
+        </div>
     );
 }
-
-const DARK = "@media (prefers-color-scheme: dark)";
-const styles = stylex.create({
-    container: {
-        display: "flex",
-        flexDirection: "column",
-        height: sizes.h_screen,
-        boxSizing: "border-box",
-        gap: sizes.spacing4,
-        padding: sizes.spacing4,
-    },
-    headerSection: {
-        display: "flex",
-        gap: sizes.spacing2,
-        alignItems: "center",
-        padding: sizes.spacing2,
-        borderRadius: rounded.lg,
-        backgroundColor: {
-            default: colours.gray200,
-            [DARK]: colours.gray800,
-        },
-    },
-    sheetTypeText: {
-        height: "fit-content",
-        borderRadius: rounded.base,
-        padding: sizes.spacing1,
-        backgroundColor: {
-            default: colours.blue200,
-            [DARK]: colours.blue900,
-        },
-        fontWeight: fontWeights.semibold,
-        fontSize: fontSizes.base,
-        lineHeight: fontSizes.base,
-    },
-    characterName: {
-        fontSize: fontSizes.xl,
-        lineHeight: fontSizes.xl,
-        fontWeight: fontWeights.bold,
-    },
-
-    tabButtonList: {
-        display: "flex",
-        marginLeft: "auto",
-    },
-    tabButton: {
-        display: "flex",
-        alignItems: "center",
-        gap: sizes.spacing1,
-        padding: `${sizes.spacing1} ${sizes.spacing2}`,
-        borderRadius: rounded.base,
-        border: {
-            default: `1px solid ${colours.gray300}`,
-            [DARK]: `1px solid ${colours.gray700}`,
-        },
-        background: "none",
-        backgroundColor: {
-            ":hover": {
-                default: colours.gray300,
-                [DARK]: colours.gray700,
-            },
-            ":is([data-state=active])": {
-                default: colours.gray300,
-                [DARK]: colours.gray700,
-            },
-        },
-        fontSize: fontSizes.sm,
-        lineHeight: fontSizes.sm,
-        cursor: "pointer",
-    },
-
-    baseTabContentBox: {
-        display: {
-            default: "none",
-            ":is([data-state=active])": "flex",
-        },
-    },
-    viewTabContentBox: {
-        margin: "auto auto",
-    },
-    editTabContentBox: {
-        flexGrow: 1,
-    },
-});
