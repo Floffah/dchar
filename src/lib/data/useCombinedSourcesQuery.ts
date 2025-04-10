@@ -60,11 +60,7 @@ export function useCombinedSourcesQuery(
         if (opts.refetchOnSourcesChange) {
             introspectSourcesQuery.refetch();
         }
-    }, [
-        characterSheetSources,
-        introspectSourcesQuery,
-        opts.refetchOnSourcesChange,
-    ]);
+    }, [characterSheetSources]);
 
     return introspectSourcesQuery;
 }

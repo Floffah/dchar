@@ -13,6 +13,7 @@ import {
     stringifySheet,
 } from "@/lib/characterSheets/stringifySheet";
 import { useCombinedSourcesQuery } from "@/lib/data/useCombinedSourcesQuery";
+import { db } from "@/lib/localdb";
 import {
     CharacterEditorAction,
     useCharacterEditorStore,
@@ -59,10 +60,32 @@ export default function CharacterPage({
         const searchParams = new URLSearchParams(window.location.search);
 
         if (searchParams.has("data")) {
+            const existingSheet = parseSheet(searchParams.get("data")!);
+
             const newSheet = {
                 sources: characterSheet.sources,
                 variables: characterSheet.variables,
             } as CharacterSheet;
+
+            if (characterSheet.name) {
+                if (
+                    existingSheet?.variables?.characterName &&
+                    existingSheet.variables.characterName.value !==
+                        characterSheet.name
+                ) {
+                    db.characterSheets.delete(
+                        existingSheet.variables.characterName.value,
+                    );
+                }
+
+                db.characterSheets.put(
+                    {
+                        name: characterSheet.name,
+                        content: newSheet,
+                    },
+                    characterSheet.name,
+                );
+            }
 
             searchParams.set("data", stringifySheet(newSheet));
 
@@ -72,7 +95,7 @@ export default function CharacterPage({
                 `${window.location.pathname}?${searchParams}`,
             );
         }
-    }, [characterSheet.sources, characterSheet.variables]);
+    }, [characterSheet.name, characterSheet.sources, characterSheet.variables]);
 
     return (
         <div className="flex h-screen flex-col gap-4 p-4">
