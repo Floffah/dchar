@@ -35,7 +35,15 @@ export const useCharacterSheetStore = create<CharacterSheetState>((set) => ({
     setName: (name) => set({ name }),
 
     setVariable: (key, value) =>
-        set((state) => ({ variables: { ...state.variables, [key]: value } })),
+        set((state) => ({
+            variables: {
+                ...state.variables,
+                [key]: {
+                    ...(state.variables[key] ?? {}),
+                    value,
+                },
+            },
+        })),
     removeVariable: (key) =>
         set((state) => {
             const { [key]: _, ...rest } = state.variables;

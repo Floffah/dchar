@@ -53,13 +53,18 @@ export function useCombinedSourcesQuery(
             }
             return introspectSourceDefinitions(sources);
         },
+        networkMode: "offlineFirst",
     });
 
     useEffect(() => {
         if (opts.refetchOnSourcesChange) {
             introspectSourcesQuery.refetch();
         }
-    }, [characterSheetSources]);
+    }, [
+        characterSheetSources,
+        introspectSourcesQuery,
+        opts.refetchOnSourcesChange,
+    ]);
 
     return introspectSourcesQuery;
 }

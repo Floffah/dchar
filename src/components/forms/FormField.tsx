@@ -33,12 +33,12 @@ export function FormField({
             return error.message;
         }
 
-        if ("message" in error && typeof error.message === "string") {
-            return error.message;
-        }
-
         if (typeof error === "string") {
             return error;
+        }
+
+        if ("message" in error && typeof error.message === "string") {
+            return error.message;
         }
 
         return "An unknown error occurred.";

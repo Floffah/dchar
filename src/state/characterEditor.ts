@@ -8,12 +8,16 @@ export enum CharacterEditorAction {
 
 interface CharacterEditor {
     currentAction: CharacterEditorAction;
+    selectedPage: string;
 
     setCurrentAction: (action: CharacterEditorAction) => void;
+    setSelectedPage: (page: string) => void;
 }
 
 export const useCharacterEditorStore = create<CharacterEditor>((set) => ({
     currentAction: CharacterEditorAction.EDIT,
+    selectedPage: "character",
 
     setCurrentAction: (action) => set({ currentAction: action }),
+    setSelectedPage: (page) => set({ selectedPage: page }),
 }));

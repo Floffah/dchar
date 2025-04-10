@@ -48,6 +48,10 @@
                   "required": {
                     "type": "boolean"
                   },
+                  "section": {
+                    "description": "The ID of the section this field belongs to",
+                    "type": "string"
+                  },
                   "type": {
                     "enum": [
                       "string",
@@ -67,7 +71,8 @@
                 "required": [
                   "name",
                   "description",
-                  "type"
+                  "type",
+                  "section"
                 ],
                 "type": "object"
               },

@@ -19,9 +19,11 @@
         "fields": {
             "name": {
                 "name": "Name",
+                "section": "profile",
                 "type": "string",
                 "description": "The name of your character",
-                "variable": "characterName"
+                "variable": "characterName",
+                "required": true
             }
         },
         "variables": {
@@ -30,5 +32,5 @@
             }
         }
     },
-    "version": "sha256:617764f40a2ebf6a80de6f57ca7a395b8a35a3591da69a90088fbf54dc9e9d48"
+    "version": "sha256:ed7da748011b3f4468c7b0b9d9c7d1960ed67459134364d27afb8ae3b8281906"
 }

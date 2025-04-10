@@ -113,6 +113,11 @@ export interface JSONSource {
                  * The variable this field is bound to.
                  */
                 variable?: string;
+
+                /**
+                 * The ID of the section this field belongs to
+                 */
+                section: string;
             };
         };
     };

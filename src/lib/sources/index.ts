@@ -30,9 +30,11 @@ export const builtinSources: Record<
                 fields: {
                     name: {
                         name: "Name",
+                        section: "profile",
                         type: "string",
                         description: "The name of your character",
                         variable: "characterName",
+                        required: true,
                     },
                 },
                 variables: {
